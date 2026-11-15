@@ -1,0 +1,30 @@
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# WorkBuddy local memory (not part of plugin source)
+.workbuddy/
+
+# 本地开发服务器的运行态产物（devtools/devserver.py 生成，非源码）
+devtools/.devdata.json
+devtools/.server.log
+
+# 本地 Python 虚拟环境（隔离测试用，非源码，切勿提交）
+.venv/
+
+# 插件运行时数据目录（AstrBot 为插件生成的 data/，非源码，切勿提交）
+data/
+
+# e2e 测试运行产物（非源码，切勿提交）
+outputs/
+
+# 会话级任务清单（不提交）
+*_TODO.md
+
+# 会话临时产物（Box-Agent scratch / 临时预览，非源码）
+.box-agent-scratch/
+prototype/
+pages/admin/dropdown-preview.html

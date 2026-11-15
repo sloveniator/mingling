@@ -1,0 +1,46 @@
+# astrbot_plugin_mingbu — 工程化配置（P2-7：ruff + mypy 基线）
+# 在隔离环境中通过 venv 安装 dev 工具：
+#   python -m venv .venv && .venv/Scripts/python -m pip install pytest ruff mypy aiohttp
+#   .venv/Scripts/python -m pytest tests/
+#   .venv/Scripts/python -m ruff check .
+#   .venv/Scripts/python -m mypy .
+
+[project]
+name = "astrbot-plugin-mingbu"
+dynamic = ["version"]
+description = "AstrBot 神秘 AI 朋友插件（含暗盘能力）"
+requires-python = ">=3.9"
+dependencies = ["aiohttp>=3.9,<4.0"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+# E=pycodestyle 错误, F=pyflakes(未定义/未使用), W=警告, I=import 排序
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]  # 长中文行交由 line-length 容忍；不强行拆行影响可读性
+
+[tool.ruff.lint.per-file-ignores]
+# 测试与桩文件放宽
+"tests/*" = ["F401", "F811"]
+# 部署诊断脚本：故意用「未使用的导入」做依赖可用性探测，且 import 不在文件顶部
+"verify_hooks.py" = ["E402", "F401", "F811"]
+# 插件入口：必须先向 sys.path 注入插件目录再 import 本地模块，import 不在文件顶部属预期
+"main.py" = ["E402"]
+
+[tool.setuptools.dynamic]
+version = {attr = "_version.VERSION"}
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.mypy]
+# 注：运行目标为 Python 3.9（AstrBot 环境），但 mypy 本体要求类型检查基线 >=3.10。
+# 代码已用 `from __future__ import annotations` + `Optional[...]` 保证 3.9 运行时兼容，
+# 此处仅将 mypy 基线设为 3.10 以通过工具链校验。
+python_version = "3.10"
+ignore_missing_imports = true
+warn_unused_ignores = false
+disallow_untyped_defs = false

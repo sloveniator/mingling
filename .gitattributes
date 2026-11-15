@@ -1,0 +1,42 @@
+# 分发包瘦身与开发工具隔离
+# ==========================
+# export-ignore 只影响 `git archive` 生成的源码包（GitHub 的 zipball/tarball
+# 与 Release 源码包都走这条路径）。AstrBot 插件市场按 ZIP 安装时，下列内容
+# 不会进入用户的插件目录。
+#
+# 为什么不在部署脚本里 rm 掉这些文件：install.sh / deploy_to_vps.sh 用
+# `git clone` + `git merge --ff-only` 做安装与升级，删除已跟踪文件会让工作区
+# 变脏，导致后续升级直接失败。因此 clone 模式下这些文件仍会存在——它们不被
+# 运行时导入（由 tests/test_devtools_isolation.py 的 import 闭包检查保证），
+# 且 devtools/astrbot_stub.py 装了硬护栏，检测到真实 AstrBot 会拒绝打桩。
+
+# ---- 开发与测试工具 ----
+# 目录不写尾部斜杠：gitattributes 的匹配语义与 gitignore 不同，带斜杠时
+# `git check-attr <dir>` 查不到属性，不利于自动化校验（见
+# tests/test_devtools_isolation.py）。无斜杠形式同样能让 git archive 跳过整棵子树。
+devtools            export-ignore
+tests               export-ignore
+prototype           export-ignore
+verify_hooks.py     export-ignore
+
+# ---- 测试数据（仅 tests/ 使用，合计约 4.5MB）----
+oracle_fixtures.json        export-ignore
+oracle_fixtures_large.json  export-ignore
+oracle.mjs                  export-ignore
+
+# ---- CI 配置 ----
+.github/            export-ignore
+.gitattributes      export-ignore
+
+# ---- 过程性文档（保留 README / ARCHITECTURE / CONFIG_TEMPLATE 供用户查阅）----
+DARKCHANNEL_STRESS_PLAN.md    export-ignore
+DARKCHANNEL_STRESS_REPORT.md  export-ignore
+UI_VERIFICATION_REPORT.md     export-ignore
+REFERENCE_PLUGIN_ANALYSIS.md  export-ignore
+OPTIMIZATION_REPORT.md        export-ignore
+
+# 文本文件统一 LF，避免跨平台换行噪音
+*.py    text eol=lf
+*.sh    text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf

@@ -1,0 +1,755 @@
+{
+  "mingbu_api_url": {
+    "type": "string",
+    "title": "Mingbu 服务地址",
+    "description": "Mingbu 命理计算服务地址。也可通过环境变量 MINGBU_API_URL 设置，配置项优先级更高。",
+    "default": "http://localhost:2963"
+  },
+  "client_archive_enabled": {
+    "type": "bool",
+    "title": "排盘后自动建档到命理后端",
+    "description": "开启后，用户排盘（八字/紫微/合参）保存出生信息时，会后台异步归档到 Mingbu 客户库（/api/clients/ensure），用于紫占客户管理与学习校准。非关键、非阻塞、失败静默。",
+    "default": true
+  },
+  "mingbu_interpret_enabled": {
+    "type": "bool",
+    "title": "启用命理 AI 解读(interpret)",
+    "description": "开启后，暗盘可调用 Mingbu 的 /api/interpret 端点生成更丰富的 LLM 解读（消耗平台侧 LLM 额度）。关闭则沿用本地翻译表的轻量洞察。",
+    "default": false
+  },
+  "mingbu_interpret_provider": {
+    "type": "string",
+    "title": "解读 Provider",
+    "description": "调用 /api/interpret 时使用的 LLM provider（deepseek/kimi/gemini/claude/openrouter/custom）。留空用平台默认。",
+    "default": ""
+  },
+  "mingbu_interpret_api_key": {
+    "type": "string",
+    "title": "解读 API Key",
+    "description": "对应 provider 的 API Key。留空则使用平台环境变量配置。",
+    "default": ""
+  },
+  "mingbu_interpret_base_url": {
+    "type": "string",
+    "title": "解读 Base URL",
+    "description": "对应 provider 的 API Base URL（custom provider 必填）。",
+    "default": ""
+  },
+  "mingbu_interpret_model": {
+    "type": "string",
+    "title": "解读模型",
+    "description": "对应 provider 的模型名。留空用平台默认模型。",
+    "default": ""
+  },
+  "persona_name": {
+    "type": "string",
+    "title": "Bot 名字",
+    "description": "灵犀对用户的自称。仅在首次加载或人格数据丢失时使用。",
+    "default": "灵犀"
+  },
+  "counseling_enabled": {
+    "type": "bool",
+    "title": "启用命理咨询",
+    "description": "开启后，Bot 可响应 /mingbu 等命理相关指令。",
+    "default": true
+  },
+  "tarot_enabled": {
+    "type": "bool",
+    "title": "启用塔罗占卜",
+    "description": "开启后，Bot 可使用塔罗牌（divination_tarot 工具与 /塔罗 指令）。纯本地抽牌，无需后端命理服务。",
+    "default": true
+  },
+  "health_enabled": {
+    "type": "bool",
+    "title": "启用健康生活指导",
+    "description": "开启后，Bot 可提供日常作息/饮食/运动等个性化建议（health_advice 工具与 /健康 指令）。",
+    "default": true
+  },
+  "counseling_crisis_enabled": {
+    "type": "bool",
+    "title": "启用危机识别红线",
+    "description": "开启后，Bot 会识别自我伤害/轻生意向并注入危机支持（含心理援助热线），且此时绝不进行命理预测。",
+    "default": true
+  },
+  "growth_engine_enabled": {
+    "type": "bool",
+    "title": "启用成长反思",
+    "description": "开启后，Bot 会定期生成成长反思。",
+    "default": true
+  },
+  "dream_engine_enabled": {
+    "type": "bool",
+    "title": "启用梦境/预感",
+    "description": "开启后，Bot 会生成夜梦整理和预感线索。",
+    "default": true
+  },
+  "token_monitor_enabled": {
+    "type": "bool",
+    "title": "启用 Token 监控",
+    "description": "记录插件内部任务的调用次数、Token 消耗和失败记录。",
+    "default": true
+  },
+  "social_graph_enabled": {
+    "type": "bool",
+    "title": "启用社交关系图谱",
+    "description": "开启后，Bot 会维护群组节点和朋友关系网。",
+    "default": true
+  },
+  "darkchannel_enabled": {
+    "type": "bool",
+    "title": "启用命理暗盘",
+    "description": "开启后，Bot 会在回复中融入命理暗盘洞察（不泄露术语）。",
+    "default": true
+  },
+  "group_slang_enabled": {
+    "type": "bool",
+    "title": "启用群黑话学习",
+    "description": "开启后，Bot 会自动学习群内黑话并适时使用。",
+    "default": true
+  },
+  "character_collection_enabled": {
+    "type": "bool",
+    "title": "启用角色收集玩法",
+    "description": "开启后，用户首次添加时会随机分配角色，好感度达标可解锁新角色。",
+    "default": true
+  },
+  "conversation_inspection_enabled": {
+    "type": "bool",
+    "title": "启用对话检视",
+    "description": "开启后，Bot 会分析对话权重并提取重要记忆。",
+    "default": true
+  },
+  "news_enabled": {
+    "type": "bool",
+    "title": "启用新闻阅读",
+    "description": "Bot 会按日程读取热点并形成近期见闻。",
+    "default": false
+  },
+  "proactive_search_enabled": {
+    "type": "bool",
+    "title": "启用主动搜索",
+    "description": "Bot 会按人格兴趣主动搜索并留下探索笔记。",
+    "default": false
+  },
+  "proactive_enabled": {
+    "type": "bool",
+    "title": "启用主动关怀",
+    "description": "是否允许灵犀根据关系和活跃度主动给用户发消息。",
+    "default": true
+  },
+  "quiet_hours_start": {
+    "type": "int",
+    "title": "免打扰开始时间",
+    "description": "24小时制。开始时间大于结束时间时表示跨午夜（如 23-8）。",
+    "default": 23,
+    "minimum": 0,
+    "maximum": 23
+  },
+  "quiet_hours_end": {
+    "type": "int",
+    "title": "免打扰结束时间",
+    "description": "24小时制。",
+    "default": 8,
+    "minimum": 0,
+    "maximum": 23
+  },
+  "llm_temperature": {
+    "type": "float",
+    "title": "回复温度 (temperature)",
+    "description": "主回复的温度。值越低越稳定，越高越有创意。",
+    "default": 0.75,
+    "minimum": 0,
+    "maximum": 2
+  },
+  "llm_max_tokens": {
+    "type": "int",
+    "title": "最大回复长度 (max_tokens)",
+    "description": "主回复的最大 token 数。0 表示不限制。",
+    "default": 0,
+    "minimum": 0
+  },
+  "llm_persona_style": {
+    "type": "string",
+    "title": "人格风格偏好",
+    "description": "用于在世界观模板中自动选择更贴合的表述风格，不影响 AstrBot 模型选择。",
+    "enum": [
+      "default",
+      "warm",
+      "mysterious",
+      "rational",
+      "energetic",
+      "quiet",
+      "hidden"
+    ],
+    "default": "default"
+  },
+  "daily_token_limit": {
+    "type": "int",
+    "title": "每日插件 Token 限额",
+    "description": "0 表示不限制。达到限额后会跳过非必要任务。",
+    "default": 0,
+    "minimum": 0
+  },
+  "provider_main_reply": {
+    "type": "string",
+    "title": "Provider: 主回复",
+    "description": "AstrBot Provider ID，留空则使用默认 Provider。",
+    "default": ""
+  },
+  "main_reply_api_key": {
+    "type": "string",
+    "title": "主回复 · 直连 API Key",
+    "description": "自定义直连（借鉴外部服务方案）：填了 Key+Base 即独立直连，不依赖 AstrBot 服务商，服务商与模型彻底解耦。留空走下方 Provider/模型（拉取模式）。",
+    "default": ""
+  },
+  "main_reply_api_base": {
+    "type": "string",
+    "title": "主回复 · 直连接口地址",
+    "description": "OpenAI 兼容地址，如 https://api.siliconflow.cn/v1。与 Key 同填生效。",
+    "default": ""
+  },
+  "main_reply_model": {
+    "type": "string",
+    "title": "主回复 · 直连模型名",
+    "description": "直连模型，如 Qwen/Qwen3.5-4B。留空用默认。",
+    "default": ""
+  },
+  "astrbot_dashboard_url": {
+    "type": "string",
+    "title": "AstrBot Dashboard 地址（可选）",
+    "description": "命灵拉取「能力服务商」列表所用的 AstrBot Dashboard 地址。留空则尝试本机 http://127.0.0.1:6185。裸「IP:端口」/「域名:端口」会自动补 http://；公网/自签证书地址请填完整（如 https://你的域名:4456）。",
+    "default": ""
+  },
+  "astrbot_api_key": {
+    "type": "string",
+    "title": "AstrBot API Key（可选）",
+    "description": "调用 Dashboard API（/api/v1/providers）的 abk_ 密钥。留空则尝试本机默认（通常本机无需密钥）。",
+    "default": ""
+  },
+  "mc_api_key": {
+    "type": "string",
+    "title": "模型统一配置 API Key",
+    "description": "「模型统一配置」拉取 /models 与刷新模型目录时使用的 API Key。明文保存展示，方便查看与编辑；留空则使用平台默认。",
+    "default": ""
+  },
+  "mc_base_url": {
+    "type": "string",
+    "title": "模型统一配置接口地址",
+    "description": "「模型统一配置」拉取 /models 的 OpenAI 兼容接口地址（Base URL）。",
+    "default": ""
+  },
+  "mc_extra_headers": {
+    "type": "string",
+    "title": "模型统一配置额外请求头",
+    "description": "「模型统一配置」拉取 /models 时附加的额外请求头（JSON 字符串，可选）。",
+    "default": ""
+  },
+  "provider_main_reply_model": {
+    "type": "string",
+    "title": "主回复模型",
+    "description": "从已拉取模型中选择，留空则使用该服务商默认模型。",
+    "default": ""
+  },
+  "provider_dream": {
+    "type": "string",
+    "title": "Provider: 梦境/预感",
+    "default": ""
+  },
+  "provider_dream_model": {
+    "type": "string",
+    "title": "梦境/预感模型",
+    "description": "从已拉取模型中选择，留空则使用该服务商默认模型；未指定则沿用主回复模型。",
+    "default": ""
+  },
+  "dream_api_key": {
+    "type": "string",
+    "title": "梦境/预感 · 直连 API Key",
+    "description": "自定义直连（借鉴外部服务方案）：填了 Key+Base 即独立直连，不依赖 AstrBot 服务商，服务商与模型彻底解耦。留空走上方 Provider/模型（拉取模式）。",
+    "default": ""
+  },
+  "dream_api_base": {
+    "type": "string",
+    "title": "梦境/预感 · 直连接口地址",
+    "description": "OpenAI 兼容地址，如 https://api.siliconflow.cn/v1。与 Key 同填生效。",
+    "default": ""
+  },
+  "dream_model": {
+    "type": "string",
+    "title": "梦境/预感 · 直连模型名",
+    "description": "直连模型，如 Qwen/Qwen3.5-4B。留空用默认。",
+    "default": ""
+  },
+  "provider_growth": {
+    "type": "string",
+    "title": "Provider: 成长反思",
+    "default": ""
+  },
+  "provider_growth_model": {
+    "type": "string",
+    "title": "成长反思模型",
+    "description": "从已拉取模型中选择，留空则使用该服务商默认模型；未指定则沿用主回复模型。",
+    "default": ""
+  },
+  "growth_api_key": {
+    "type": "string",
+    "title": "成长反思 · 直连 API Key",
+    "description": "自定义直连（借鉴外部服务方案）：填了 Key+Base 即独立直连，不依赖 AstrBot 服务商。留空走上方 Provider/模型（拉取模式）。",
+    "default": ""
+  },
+  "growth_api_base": {
+    "type": "string",
+    "title": "成长反思 · 直连接口地址",
+    "description": "OpenAI 兼容地址，如 https://api.siliconflow.cn/v1。与 Key 同填生效。",
+    "default": ""
+  },
+  "growth_model": {
+    "type": "string",
+    "title": "成长反思 · 直连模型名",
+    "description": "直连模型，如 Qwen/Qwen3.5-4B。留空用默认。",
+    "default": ""
+  },
+  "provider_proactive": {
+    "type": "string",
+    "title": "Provider: 主动关怀",
+    "default": ""
+  },
+  "provider_proactive_model": {
+    "type": "string",
+    "title": "主动关怀模型",
+    "description": "从已拉取模型中选择，留空则使用该服务商默认模型；未指定则沿用主回复模型。",
+    "default": ""
+  },
+  "proactive_api_key": {
+    "type": "string",
+    "title": "主动关怀 · 直连 API Key",
+    "description": "自定义直连（借鉴外部服务方案）：填了 Key+Base 即独立直连，不依赖 AstrBot 服务商。留空走上方 Provider/模型（拉取模式）。",
+    "default": ""
+  },
+  "proactive_api_base": {
+    "type": "string",
+    "title": "主动关怀 · 直连接口地址",
+    "description": "OpenAI 兼容地址，如 https://api.siliconflow.cn/v1。与 Key 同填生效。",
+    "default": ""
+  },
+  "proactive_model": {
+    "type": "string",
+    "title": "主动关怀 · 直连模型名",
+    "description": "直连模型，如 Qwen/Qwen3.5-4B。留空用默认。",
+    "default": ""
+  },
+  "provider_news": {
+    "type": "string",
+    "title": "Provider: 新闻整理",
+    "default": ""
+  },
+  "provider_news_model": {
+    "type": "string",
+    "title": "新闻整理模型",
+    "description": "从已拉取模型中选择，留空则使用该服务商默认模型；未指定则沿用主回复模型。",
+    "default": ""
+  },
+  "provider_search": {
+    "type": "string",
+    "title": "Provider: 主动搜索",
+    "default": ""
+  },
+  "provider_search_model": {
+    "type": "string",
+    "title": "主动搜索模型",
+    "description": "从已拉取模型中选择，留空则使用该服务商默认模型；未指定则沿用主回复模型。",
+    "default": ""
+  },
+  "provider_image_vision": {
+    "type": "string",
+    "title": "Provider: 图片转述",
+    "default": ""
+  },
+  "provider_merged_forward": {
+    "type": "string",
+    "title": "Provider: 合并消息转述",
+    "default": ""
+  },
+  "worldview_enabled": {
+    "type": "bool",
+    "title": "启用世界观适配",
+    "description": "开启后，Bot 会把现代能力转译成当前人设能理解的世界内说法。",
+    "default": true
+  },
+  "auto_worldview_match": {
+    "type": "bool",
+    "title": "自动匹配世界观风格",
+    "description": "开启后，Bot 会根据当前角色自动选择对应的世界观风格。关闭则使用固定风格。",
+    "default": true
+  },
+  "custom_worldview_json": {
+    "type": "string",
+    "title": "自定义世界观 (JSON)",
+    "description": "高级：自定义世界观映射 JSON，会覆盖预设风格。格式参考文档。",
+    "default": ""
+  },
+  "tts_enabled": {
+    "type": "bool",
+    "title": "启用 TTS 语音增强",
+    "description": "长文本(>=阈值)自动转为语音；短文本只给文字。用户说「没听清」时转文字重发。",
+    "default": true
+  },
+  "tts_auto_for_long_text": {
+    "type": "bool",
+    "title": "长文本自动语音",
+    "description": "仅控制「长回复(>=阈值)自动转语音」这条路径；关闭后长文本不再自动语音，但带明显情绪（安慰/开心等）的短回复仍会触发语音（情绪语义路径不受此开关影响）。",
+    "default": true
+  },
+  "tts_long_text_threshold": {
+    "type": "int",
+    "title": "长文本转语音阈值(字)",
+    "description": "回复字数达到该值才转为语音；短于此值只给文字。默认 500。",
+    "default": 500,
+    "minimum": 100,
+    "maximum": 2000
+  },
+  "image_vision_enabled": {
+    "type": "bool",
+    "title": "启用图片转述增强",
+    "description": "私聊单图、引用图片、合并转发图片会生成视觉摘要。",
+    "default": true
+  },
+  "stt_enabled": {
+    "type": "bool",
+    "title": "启用语音转文字(STT)",
+    "description": "检测语音(Record)消息并转写为文本注入对话，让 Bot 能\"听\"语音。需在 AstrBot 主设置里配置好 STT provider，并在本面板打开此开关。",
+    "default": false
+  },
+  "provider_stt": {
+    "type": "string",
+    "title": "STT Provider ID（可选）",
+    "description": "指定用于语音转写的 STT provider ID；留空则使用 AStrBot 当前启用的 STT provider。",
+    "default": ""
+  },
+  "rerank_enabled": {
+    "type": "bool",
+    "title": "启用记忆重排序(Rerank)",
+    "description": "按当前消息对记忆做相关性重排，提升注入 LLM 的记忆质量。需 AStrBot 配置 Rerank provider；无则按时间/权重原序。",
+    "default": true
+  },
+  "provider_rerank": {
+    "type": "string",
+    "title": "Rerank Provider ID（可选）",
+    "description": "指定用于记忆重排序的 Rerank provider ID；留空则使用 AStrBot 首个 Rerank provider。",
+    "default": ""
+  },
+  "darkchannel_cache_ttl": {
+    "type": "int",
+    "title": "暗盘洞察缓存时间(秒)",
+    "description": "暗盘洞察结果的缓存有效期。0 表示不缓存。",
+    "default": 3600,
+    "minimum": 0
+  },
+  "proactive_interval_min": {
+    "type": "int",
+    "title": "主动消息最小间隔(分钟)",
+    "description": "同一用户两次主动消息之间的最小间隔。",
+    "default": 60,
+    "minimum": 5,
+    "maximum": 1440
+  },
+  "proactive_cooldown_hours": {
+    "type": "int",
+    "title": "主动消息冷却时间(小时)",
+    "description": "用户不活跃后，Bot 不再主动发消息的冷却时间。",
+    "default": 72,
+    "minimum": 1,
+    "maximum": 720
+  },
+  "group_reply_probability": {
+    "type": "float",
+    "title": "群聊被动回复概率",
+    "description": "群聊中未@Bot 时的被动回复概率。0=从不回复，1=总是回复。",
+    "default": 0.3,
+    "minimum": 0,
+    "maximum": 1
+  },
+  "slang_confidence_threshold": {
+    "type": "float",
+    "title": "黑话学习置信度阈值",
+    "description": "黑话被学习前需要达到的最低置信度。",
+    "default": 0.5,
+    "minimum": 0,
+    "maximum": 1
+  },
+  "weight_threshold": {
+    "type": "float",
+    "title": "对话权重阈值",
+    "description": "超过此权重的对话会被标记为高权重并可能提取为记忆。",
+    "default": 0.45,
+    "minimum": 0,
+    "maximum": 1
+  },
+  "memory_max_per_user": {
+    "type": "int",
+    "title": "每用户最大记忆数",
+    "description": "单个用户的记忆上限，超出后按衰减淘汰。",
+    "default": 400,
+    "minimum": 50,
+    "maximum": 2000
+  },
+  "dream_pool_size": {
+    "description": "夜梦池容量（2026-09-22 P2 梦池制）：每用户最多保留 N 条夜梦，新梦入库后按质量分 importance×decay 淘汰低分项。0=关闭。",
+    "type": "int",
+    "hint": "3",
+    "default": 3
+  },
+  "fallback_dream_retention_days": {
+    "description": "兜底梦保留天数：超过该天数的兜底梦（模板文本，不进投递池）在梦池清理时直接删除。0=永久保留。",
+    "type": "int",
+    "hint": "3",
+    "default": 3
+  },
+  "dream_min_new_memories": {
+    "description": "夜梦触发阈值：上次夜梦之后新增的真实互动素材（情景/情绪记忆）少于该值则当晚跳过该用户，节省 LLM 调用。0=每晚必跑。",
+    "type": "int",
+    "hint": "2",
+    "default": 2
+  },
+  "growth_min_new_memories": {
+    "description": "成长反思触发阈值：上次反思之后新增的真实互动素材少于该值则跳过该用户（避免空转重写画像）。0=每晚必跑。",
+    "type": "int",
+    "hint": "2",
+    "default": 2
+  },
+  "growth_profile_pool_size": {
+    "description": "画像池容量（2026-09-22 P4 成长池制）：每用户只保留最新 N 条 [画像] 快照，旧的在反思后删除（陈旧画像污染反思语料形成'画像写画像'）。0=不限制。",
+    "type": "int",
+    "hint": "1",
+    "default": 1
+  },
+  "growth_milestone_pool_size": {
+    "description": "里程碑池容量：每用户只保留最近 N 条成长里程碑，更旧的在反思后删除。0=不限制。",
+    "type": "int",
+    "hint": "8",
+    "default": 8
+  },
+  "task_token_limits": {
+    "description": "任务级每日 Token 限额（JSON 映射）：如 {\"dream\": 100000, \"growth\": 100000}。某任务当日用量达到限额后当晚走兜底，防止单一任务吃满全局预算。空或 0 表示不限。",
+    "type": "string",
+    "hint": "{\"dream\": 100000, \"growth\": 100000}",
+    "default": ""
+  },
+  "premonition_signal_required": {
+    "description": "预感梦信号闸（2026-09-22 P3）：开启后仅当暗盘出现真实变动信号（流年/流月地支六冲）才可能投放预感梦，无兆不预；关闭则回退旧版纯氛围随机投放。",
+    "type": "bool",
+    "default": true
+  },
+  "premonition_ttl_days": {
+    "description": "预感梦保质期（天）：库存中超过该天数的未投预感在投放检查时清仓作废，避免'三天前的不安今天才说'。0=永不过期。",
+    "type": "int",
+    "hint": "3",
+    "default": 3
+  },
+  "batch_uid_blocklist": {
+    "description": "批量任务用户黑名单（dream/growth/decay 等每晚批量任务不处理这些用户）。逗号分隔的用户ID列表，支持 * 通配（如 tester*, flake_*）。用于排除测试/压测账号，节省夜间 LLM 调用；不删除其原始数据。",
+    "type": "string",
+    "hint": "test01, tester*, flake_*",
+    "default": ""
+  },
+  "background_watch_enabled": {
+    "type": "bool",
+    "title": "启用命卜后台关注",
+    "description": "开启后，Bot 每月静默计算各用户的当前大运/流年/流月，蒸馏成一句不点破术语的'后台留意'，自然融入回复；此外用户出现高权重情绪话语时立即重算。需已接入 Mingbu API。",
+    "default": true
+  },
+  "background_watch_cron": {
+    "type": "string",
+    "title": "后台关注定时(cron)",
+    "description": "每月刷新后台注记的 cron 表达式。默认每月 1 日 07:00。另可经高权重情绪话语实时触发。",
+    "default": "0 7 1 * *"
+  },
+  "background_watch_emotion_threshold": {
+    "type": "float",
+    "title": "情绪触发的权重阈值",
+    "description": "用户话语的情绪权重绝对值（emotion_to_weight 映射，范围 0~1）达到该值即立即重算后台关注注记。越低越敏感。0 表示关闭情绪触发（仅每月定时）。",
+    "default": 0.6,
+    "minimum": 0,
+    "maximum": 1
+  },
+  "background_watch_emotion_cooldown_min": {
+    "type": "int",
+    "title": "情绪触发冷却(分钟)",
+    "description": "同一用户两次情绪触发重算的最小间隔，避免一波情绪反复打 Mingbu API。",
+    "default": 360,
+    "minimum": 5,
+    "maximum": 10080
+  },
+  "background_watch_method_default": {
+    "type": "string",
+    "title": "后台测算命理方法(默认)",
+    "description": "未显式设置(/命理方法)时使用的命理方法。可选：auto(默认，有出生信息→命盘类测算大限/流年/流月，否则卜卦类六爻卜问情况)、ziwei、bazi、liuyao、qimen、meihua。命盘类走 /api/combined 测算大限/流年/流月；卜卦类走 /api/liuyao 或 /api/qimen 卜问情况（梅花无服务端端点，桥接六爻）。",
+    "default": "auto"
+  },
+  "background_watch_bugua_question": {
+    "type": "string",
+    "title": "卜卦类默认卜问问题",
+    "description": "卜卦类(六爻/奇门/梅花)后台测算时若无法从用户近期对话提取关注点，使用的默认卜问问题。留空则自动取用户最近一条消息；仍无则使用「近期境况如何」。",
+    "default": ""
+  },
+  "self_evolution_enabled": {
+    "type": "bool",
+    "title": "启用轻量自我进化",
+    "description": "开启后，Bot 每晚把近期对话提炼为'显性事实'（偏好/计划/关系）回写持久记忆。有 LLM 调用成本，默认关闭。",
+    "default": false
+  },
+  "self_evolution_cron": {
+    "type": "string",
+    "title": "自我进化定时(cron)",
+    "description": "每晚提炼事实的 cron 表达式。默认每天 4:00。",
+    "default": "0 4 * * *"
+  },
+  "proactive_max_unanswered": {
+    "type": "int",
+    "title": "主动消息未回复上限",
+    "description": "连续主动发消息而用户一直不回的暂停阈值，防骚扰。",
+    "default": 3,
+    "minimum": 1,
+    "maximum": 20
+  },
+  "proactive_active_grace_sec": {
+    "type": "int",
+    "title": "主动消息活跃宽限(秒)",
+    "description": "用户刚发过消息后的宽限时间，期间不主动打断。",
+    "default": 120,
+    "minimum": 0,
+    "maximum": 1800
+  },
+  "tts_emotion_routing_enabled": {
+    "type": "bool",
+    "title": "启用 TTS 情绪音色路由",
+    "description": "开启后，根据回复情绪（中文启发式识别）选择 TTS 音色/语速（需 provider 支持 voice 参数，否则仅记录情绪）。",
+    "default": true
+  },
+  "provider_tts": {
+    "type": "string",
+    "title": "TTS Provider ID（可选）",
+    "description": "指定用于语音合成的 TTS provider ID；留空则使用 AStrBot 当前启用的 TTS provider。",
+    "default": ""
+  },
+  "tts_api_key": {
+    "type": "string",
+    "title": "TTS API Key",
+    "description": "直连 TTS 服务的 API Key。填此项后优先使用插件配置直接调用，不依赖 AstrBot Provider。",
+    "default": ""
+  },
+  "tts_api_base": {
+    "type": "string",
+    "title": "TTS 接口地址",
+    "description": "如 https://api.siliconflow.cn/v1（后端自动拼 /audio/speech）。留空则通过 AstrBot Provider 路由。",
+    "default": ""
+  },
+  "tts_model": {
+    "type": "string",
+    "title": "TTS 模型名",
+    "description": "如 FunAudioLLM/CosyVoice-300M、qwen3-tts-flash。留空则用 Provider 默认。注意：合成完全走 AstrBot TTS provider，模型须是你在 AstrBot 主设置里为该 provider 配置/支持的模型。",
+    "default": ""
+  },
+  "tts_voice": {
+    "type": "string",
+    "title": "TTS 音色 (voice)",
+    "description": "语音合成音色名。SiliconFlow 用「模型名:音色」(如 FunAudioLLM/CosyVoice2-0.5B:alex) 或裸名 (alex/ben/emma)；OpenAI 原生用 alloy/echo 等。留空走接口默认（SiliconFlow 为 alex）。合成完全走 AstrBot Provider，该音色透传给 provider.get_audio。",
+    "default": ""
+  },
+  "tts_max_chunk_chars": {
+    "type": "int",
+    "title": "TTS 单段最大字数",
+    "description": "长文本朗读时按句切分为多段语音逐条发送。微信客服硬限 60 秒（45007 会被适配器静默吞掉、插件无法感知失败，故必须源头预防），按最保守语速 ~2.5 字/秒，150 字内绝不超过 60 秒。此值设再大也会被钳制回 150。",
+    "default": 150
+  },
+  "embedding_enabled": {
+    "type": "bool",
+    "title": "启用记忆语义向量召回(Embedding)",
+    "description": "开启后，按当前消息对相关记忆做余弦相似度语义召回。无凭据时自动跳过，退回原排序或 Rerank。",
+    "default": true
+  },
+  "provider_embedding": {
+    "type": "string",
+    "title": "Embedding Provider ID（可选）",
+    "description": "指定用于向量化的 Embedding provider ID；留空则自动探测 AStrBot 原生 Embedding provider 或社区 astrbot_plugin_embedding_adapter。",
+    "default": ""
+  },
+  "embedding_api_key": {
+    "type": "string",
+    "title": "Embedding API Key",
+    "description": "Embedding 直连凭据（仅供面板连通性测试按钮使用）。运行时语义召回完全走 AstrBot Embedding provider，插件不做直连调用。",
+    "default": ""
+  },
+  "embedding_api_base": {
+    "type": "string",
+    "title": "Embedding 接口地址",
+    "description": "OpenAI 兼容格式，如 https://api.siliconflow.cn/v1。",
+    "default": ""
+  },
+  "embedding_model": {
+    "type": "string",
+    "title": "Embedding 模型名",
+    "description": "如 BAAI/bge-m3。留空则用 Provider 默认。",
+    "default": ""
+  },
+  "rerank_api_key": {
+    "type": "string",
+    "title": "Rerank API Key",
+    "description": "Rerank 直连凭据（仅供面板连通性测试按钮使用）。运行时记忆重排完全走 AstrBot Rerank provider，插件不做直连调用。",
+    "default": ""
+  },
+  "rerank_api_base": {
+    "type": "string",
+    "title": "Rerank 接口地址",
+    "description": "如 https://api.siliconflow.cn/v1（后端自动拼 /rerank）。",
+    "default": ""
+  },
+  "rerank_model": {
+    "type": "string",
+    "title": "Rerank 模型名",
+    "description": "如 BAAI/bge-reranker-v2-m3。",
+    "default": ""
+  },
+  "image_vision_api_key": {
+    "type": "string",
+    "title": "视觉服务 API Key",
+    "description": "视觉直连凭据（仅供面板连通性测试按钮使用）。运行时图片转述完全走 AstrBot LLM provider（provider_image_vision 或主回复 provider），插件不做直连调用；多模态能力由该 provider 提供。",
+    "default": ""
+  },
+  "image_vision_api_base": {
+    "type": "string",
+    "title": "视觉服务接口地址",
+    "description": "OpenAI 兼容格式，如 https://api.openai.com/v1。图片转述专用 LLM 的接口地址。",
+    "default": ""
+  },
+  "image_vision_model": {
+    "type": "string",
+    "title": "视觉服务模型名",
+    "description": "如 gpt-4o、claude-3.5-sonnet。需支持多模态。",
+    "default": ""
+  },
+  "merged_forward_api_key": {
+    "type": "string",
+    "title": "合并转述 API Key",
+    "description": "合并消息转述专用 LLM 的 API Key。填此项后合并转发会异步生成一句自然摘要（而非仅记录原文）；也可在「模型配置」页一键拉取并分配。",
+    "default": ""
+  },
+  "merged_forward_api_base": {
+    "type": "string",
+    "title": "合并转述接口地址",
+    "description": "OpenAI 兼容格式，如 https://api.openai.com/v1。合并消息转述专用 LLM 的接口地址。",
+    "default": ""
+  },
+  "merged_forward_model": {
+    "type": "string",
+    "title": "合并转述模型名",
+    "description": "留空则用默认模型。",
+    "default": ""
+  },
+  "integration_mode": {
+    "type": "string",
+    "title": "增强集成模式",
+    "description": "命灵注入 AstrBot 请求的方式。observe=只记录不注入（零行为变化，用于调试/观察）；enhance=按需注入少量动态上下文（默认）；assist=增强模式并允许调用记忆/情绪/关系等工具（深度陪伴）。",
+    "default": "enhance",
+    "hint": "observe / enhance / assist"
+  }
+}

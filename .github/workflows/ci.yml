@@ -1,0 +1,60 @@
+# mingling — 持续集成
+# 保护「优化 + 重构」成果：任何变更都先过 lint 再跑全量测试。
+# 测试不依赖真实 astrbot 运行时——tests/conftest.py 会注入一套内存桩，
+# 因此本工作流在纯 GitHub Runner 上即可完整跑通。
+#
+# 桩本身也在被测：tests/test_astrbot_stub_identity.py 遍历磁盘上每个顶层模块与 Star，
+# 断言「都能导入」且「短名与包名指向同一个模块对象」。前者防止导入期异常被桩静默吞掉
+# 造成假绿，后者防止同一模块被加载两份导致单例割裂——两类故障都曾真实发生过。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 同一分支上的旧运行若未完成，自动取消，节省 Runner 额度。
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # 3.9 是 pyproject 声明的下限（AstrBot 运行环境），必须真实验证而非只写在元数据里。
+        #
+        # v4.8.2 起矩阵扩到三档，原因是 3.9 上实测到一个静态扫描原理上抓不到的缺陷：
+        # 模块级 `asyncio.Lock()/Event()/Semaphore()` 在 3.9 构造时就会绑定「当时的」事件循环，
+        # 之后 `asyncio.run()` 起新 loop 再 await 会抛 RuntimeError；3.10+ 构造时不绑定，
+        # 因此只跑新版本的 CI 永远看不到。语法层兼容 ≠ 运行时行为一致，下限版本必须真跑。
+        #
+        # 3.11 代表当前主流部署环境，3.13 代表最新解释器（提前暴露弃用与行为变更）。
+        python-version: ["3.9", "3.11", "3.13"]
+    name: lint-and-test (py${{ matrix.python-version }})
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dev tools
+        run: |
+          python -m pip install --upgrade pip
+          # 运行时依赖 aiohttp（部分源码模块 import 它）；
+          # 测试靠内存桩，无需真实 astrbot；lint + 测试只需 ruff + pytest。
+          python -m pip install "ruff>=0.5" "pytest>=8" "aiohttp>=3.9,<4.0"
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Pytest
+        run: python -m pytest tests/ -q

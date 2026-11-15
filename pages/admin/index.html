@@ -1,0 +1,884 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>命灵 · 管理控制台</title>
+    <link rel="stylesheet" href="./style.css?v=4.8.133" />
+  </head>
+  <body>
+    <div class="cosmic-bg">
+      <div class="star-field"></div>
+      <div class="nebula nebula-1"></div>
+      <div class="nebula nebula-2"></div>
+      <div class="nebula nebula-3"></div>
+    </div>
+
+    <div class="wrap">
+      <header class="hero">
+        <div class="hero-left">
+          <div class="hero-icon">
+            <svg viewBox="0 0 64 64" class="magic-circle">
+              <circle cx="32" cy="32" r="28" fill="none" stroke="url(#magic-gradient)" stroke-width="1.5" opacity="0.8"/>
+              <circle cx="32" cy="32" r="22" fill="none" stroke="url(#magic-gradient)" stroke-width="1" opacity="0.5"/>
+              <circle cx="32" cy="32" r="16" fill="none" stroke="url(#magic-gradient)" stroke-width="0.5" opacity="0.3"/>
+              <line x1="32" y1="4" x2="32" y2="12" stroke="url(#magic-gradient)" stroke-width="1.5"/>
+              <line x1="32" y1="52" x2="32" y2="60" stroke="url(#magic-gradient)" stroke-width="1.5"/>
+              <line x1="4" y1="32" x2="12" y2="32" stroke="url(#magic-gradient)" stroke-width="1.5"/>
+              <line x1="52" y1="32" x2="60" y2="32" stroke="url(#magic-gradient)" stroke-width="1.5"/>
+              <polygon points="32,8 34,16 40,16 36,20 38,26 32,22 26,26 28,20 24,16 30,16" fill="url(#magic-gradient)" opacity="0.9"/>
+              <defs>
+                <linearGradient id="magic-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#a78bfa"/>
+                  <stop offset="50%" style="stop-color:#4ade80"/>
+                  <stop offset="100%" style="stop-color:#22d3ee"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="hero-text">
+            <h1>命灵·AI伴侣</h1>
+            <p class="subtitle">✨ 你的神秘朋友 · 有记忆、有性格、会成长</p>
+          </div>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-card">
+            <div class="stat-icon">👤</div>
+            <div class="stat-value" id="statUsers">–</div>
+            <div class="stat-label">活跃羁绊</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-value" id="statGroups">–</div>
+            <div class="stat-label">守护群组</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💬</div>
+            <div class="stat-value" id="statInteractions">–</div>
+            <div class="stat-label">互动次数</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-value" id="statMemories">–</div>
+            <div class="stat-label">记忆总量</div>
+          </div>
+        </div>
+      </header>
+
+      <nav class="tabs">
+        <button class="tab active" data-tab="overview"><span class="tab-icon">🏠</span><span>总览</span></button>
+        <button class="tab" data-tab="users"><span class="tab-icon">💝</span><span>羁绊管理</span></button>
+        <button class="tab" data-tab="characters"><span class="tab-icon">🎭</span><span>角色收集</span></button>
+        <button class="tab" data-tab="config"><span class="tab-icon">⚙️</span><span>核心配置</span></button>
+        <button class="tab" data-tab="conversation"><span class="tab-icon">💬</span><span>对话检视</span></button>
+        <button class="tab" data-tab="tokens"><span class="tab-icon">💰</span><span>资源监控</span></button>
+        <button class="tab" data-tab="diagnostics"><span class="tab-icon">🩺</span><span>依赖诊断</span></button>
+      </nav>
+
+      <main>
+        <!-- ═══ 总览 ═══ -->
+        <section id="tab-overview" class="tab-content active">
+          <div class="grid-2">
+            <div class="panel">
+              <div class="panel-header">
+                <h2><span class="badge">今日运势</span> Bot 状态</h2>
+                <div class="panel-actions">
+                  <span class="status-dot online"></span>
+                  <span class="status-text">在线</span>
+                </div>
+              </div>
+              <div class="status-grid">
+                <div class="status-item">
+                  <div class="status-ring" data-value="62">
+                    <svg viewBox="0 0 80 80" class="ring-svg">
+                      <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6"/>
+                      <circle cx="40" cy="40" r="32" fill="none" stroke="#a78bfa" stroke-width="6" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="76"/>
+                    </svg>
+                    <div class="ring-inner">心情</div>
+                    <div class="ring-value" id="botMood">62</div>
+                  </div>
+                </div>
+                <div class="status-item">
+                  <div class="status-ring" data-value="75">
+                    <svg viewBox="0 0 80 80" class="ring-svg">
+                      <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6"/>
+                      <circle cx="40" cy="40" r="32" fill="none" stroke="#4ade80" stroke-width="6" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="50"/>
+                    </svg>
+                    <div class="ring-inner">精力</div>
+                    <div class="ring-value" id="botEnergy">75</div>
+                  </div>
+                </div>
+                <div class="status-item">
+                  <div class="status-ring" data-value="45">
+                    <svg viewBox="0 0 80 80" class="ring-svg">
+                      <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6"/>
+                      <circle cx="40" cy="40" r="32" fill="none" stroke="#22d3ee" stroke-width="6" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="110"/>
+                    </svg>
+                    <div class="ring-inner">社交需求</div>
+                    <div class="ring-value" id="botSocial">45</div>
+                  </div>
+                </div>
+                <div class="status-item">
+                  <div class="status-ring" data-value="88">
+                    <svg viewBox="0 0 80 80" class="ring-svg">
+                      <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6"/>
+                      <circle cx="40" cy="40" r="32" fill="none" stroke="#facc15" stroke-width="6" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="24"/>
+                    </svg>
+                    <div class="ring-inner">神秘直觉</div>
+                    <div class="ring-value" id="botIntimacy">88</div>
+                  </div>
+                </div>
+              </div>
+              <div class="persona-preview">
+                <div class="persona-tag">当前人格</div>
+                <div class="persona-name" id="personaName">灵犀</div>
+                <div class="persona-traits" id="personaTraits">神秘、敏锐、体贴</div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <h2><span class="badge">记忆快照</span> 最近互动</h2>
+              </div>
+              <div class="activity-feed" id="activityFeed">
+                <div class="loading-spinner"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h2><span class="badge">星图</span> 关系网络</h2>
+            </div>
+            <div class="graph-view" id="graphView">
+              <div class="loading-spinner"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ 羁绊管理 ═══ -->
+        <section id="tab-users" class="tab-content">
+          <div class="panel-header-row">
+            <h2>💝 羁绊管理</h2>
+            <div class="search-box">
+              <input type="text" placeholder="搜索用户 UID 或昵称..." id="userSearch">
+              <span class="search-icon">🔍</span>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="panel user-list-panel">
+              <div class="user-list" id="userList"><div class="loading-spinner"></div></div>
+            </div>
+            <div class="panel user-detail-panel">
+              <div class="empty-state" id="userDetailEmpty">
+                <div class="empty-icon">👆</div>
+                <p>从左侧选择一位朋友</p>
+              </div>
+              <div class="user-detail" id="userDetail" style="display:none">
+                <div class="detail-header">
+                  <div class="detail-avatar" id="detailAvatar">U</div>
+                  <div class="detail-info">
+                    <div class="detail-name" id="detailName">用户名称</div>
+                    <div class="detail-meta">
+                      <span class="relation-tag" id="relationTag">刚认识</span>
+                      <span class="detail-uid" id="detailUid">UID</span>
+                    </div>
+                  </div>
+                  <div class="affinity-bar-wrap">
+                    <div class="affinity-bar">
+                      <div class="affinity-fill" id="affinityFill"></div>
+                    </div>
+                    <div class="affinity-score" id="affinityScore">0</div>
+                  </div>
+                </div>
+                <div class="detail-section">
+                  <h3>🤍 亲密指数</h3>
+                  <div class="stats-row">
+                    <div class="mini-stat"><div class="mini-value" id="interactionCount">0</div><div class="mini-label">互动次数</div></div>
+                    <div class="mini-stat"><div class="mini-value" id="intimacyMoments">0</div><div class="mini-label">心动时刻</div></div>
+                    <div class="mini-stat"><div class="mini-value" id="lastInteract">–</div><div class="mini-label">最近互动</div></div>
+                  </div>
+                </div>
+                <div class="detail-section">
+                  <h3>📖 记忆时间线</h3>
+                  <div class="memory-timeline" id="memoryTimeline"><div class="empty-text">暂无记忆</div></div>
+                </div>
+                <div class="detail-section">
+                  <h3>🌙 梦境碎片</h3>
+                  <div class="dream-list" id="dreamList"><div class="empty-text">暂无梦境记录</div></div>
+                </div>
+                <div class="detail-actions">
+                  <button class="action-btn primary" data-act="dream">🌙 生成夜梦</button>
+                  <button class="action-btn" data-act="premonition">✨ 生成预感</button>
+                  <button class="action-btn" data-act="growth">📈 触发反思</button>
+                </div>
+                <div class="action-output" id="actionOutput"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ 角色收集 ═══ -->
+        <section id="tab-characters" class="tab-content">
+          <div class="panel-header-row">
+            <h2>🎭 角色收集</h2>
+            <span class="subtitle-text">解锁神秘的命运角色</span>
+          </div>
+          <div class="character-grid" id="characterGrid"><div class="loading-spinner"></div></div>
+          <div class="collection-progress-bar">
+            <div class="progress-header">
+              <span>收集进度</span>
+              <span class="progress-count" id="collectionCount">0/7</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="collectionProgress"></div>
+              <div class="progress-glow"></div>
+            </div>
+          </div>
+          <div class="config-section" style="margin-top:24px">
+            <div class="config-section-header">
+              <div class="config-icon">🔄</div>
+              <h3>角色切换</h3>
+              <p class="config-desc">手动切换当前生效的角色人格</p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+              <div style="flex:1;min-width:200px">
+                <label class="config-label">选择角色</label>
+                <select class="config-input" id="characterSwitchSelect"><option value="">加载中...</option></select>
+              </div>
+              <button class="btn btn-primary" id="characterSwitchBtn">切换角色</button>
+            </div>
+            <p class="config-hint" style="margin-top:8px">切换后，Bot 的人格、说话风格和世界观会随之改变</p>
+          </div>
+        </section>
+
+        <!-- ════════════════════════════════════════════════
+             核心配置（含全部设置，已中文化并简化）
+             ════════════════════════════════════════════════ -->
+        <section id="tab-config" class="tab-content">
+          <div class="panel-header-row">
+            <h2>⚙️ 核心配置</h2>
+            <button class="btn btn-primary" id="saveConfig">💾 保存全部</button>
+          </div>
+
+          <!-- ── 📡 模型统一配置（拉取 / 手输 / 默认 三种方式合并在同一框架） ── -->
+          <div class="config-section mc-assistant" id="mcAssistant">
+            <div class="config-section-header">
+              <div class="config-icon">📡</div>
+              <h3>模型统一配置</h3>
+              <p class="config-desc">填一个 OpenAI 兼容接口地址与 Key，一键拉取该账号下全部模型；也可直接在下方手输模型名；外部服务留空即用 AstrBot 默认。三种方式任选其一，互不打断。</p>
+            </div>
+            <div class="config-grid">
+              <div class="config-item full-width">
+                <label class="config-label">接口地址 (Base URL)</label>
+                <input type="text" class="config-input" id="mcBaseUrl" data-key="mc_base_url" placeholder="如 https://api.openai.com/v1 或 https://api.siliconflow.cn/v1">
+                <p class="config-hint">OpenAI 兼容格式；填一个即可覆盖下方所有直连能力（手输模型名时同样需要它作接口地址）</p>
+              </div>
+              <div class="config-item full-width">
+                <label class="config-label">API Key</label>
+                <input type="text" class="config-input" id="mcApiKey" data-key="mc_api_key" placeholder="sk-...">
+                <p class="config-hint">此 Key 明文保存展示，方便查看与编辑；留空则使用平台默认</p>
+              </div>
+              <div class="config-item full-width">
+                <label class="config-label">额外请求头 (可选, JSON)</label>
+                <input type="text" class="config-input" id="mcExtraHeaders" data-key="mc_extra_headers" placeholder='如 {"X-Title":"mingbu"}'>
+              </div>
+            </div>
+            <div class="config-actions-row">
+              <button class="btn btn-primary" id="fetchModelsBtn">🔄 拉取模型列表</button>
+              <span class="config-hint" id="mcStatus"></span>
+            </div>
+
+            <!-- 拉取的模型 -->
+            <div id="mcCatalogSection" class="mc-inner-section">
+              <div class="config-section-header">
+                <div class="config-icon">📋</div>
+                <h3>拉取的模型</h3>
+                <p class="config-desc">按能力分类自动标记；已分配的角色会在模型中以徽标标出</p>
+              </div>
+              <div id="mcCatalog" class="mc-catalog"></div>
+            </div>
+          </div>
+
+          <!-- ── 基础人格 ── -->
+          <div class="config-section">
+            <div class="config-section-header">
+              <div class="config-icon">🧬</div>
+              <h3>基础人格</h3>
+              <p class="config-desc">名字、性格倾向、模型参数</p>
+            </div>
+            <div class="config-grid">
+              <div class="config-item">
+                <label class="config-label">Bot 名字</label>
+                <input type="text" class="config-input" data-key="persona_name" placeholder="例如：灵犀">
+                <p class="config-hint">对话中使用的自称</p>
+              </div>
+              <div class="config-item">
+                <label class="config-label">人格风格</label>
+                <select class="config-input" data-key="llm_persona_style">
+                  <option value="default">默认 · 神秘朋友</option>
+                  <option value="warm">温暖 · 贴心陪伴</option>
+                  <option value="mysterious">神秘 · 直觉洞察</option>
+                  <option value="rational">理性 · 冷静分析</option>
+                  <option value="energetic">活力 · 热情洋溢</option>
+                  <option value="quiet">安静 · 默默守护</option>
+                </select>
+              </div>
+              <div class="config-item">
+                <label class="config-label">创意温度</label>
+                <input type="range" class="config-input range" data-key="llm_temperature" min="0" max="2" step="0.05" value="0.75">
+                <div class="range-display" data-for="llm_temperature">0.75</div>
+                <p class="config-hint">值越低越保守稳定，越高越有创意和随机性</p>
+              </div>
+              <div class="config-item">
+                <label class="config-label">最大回复长度</label>
+                <input type="number" class="config-input" data-key="llm_max_tokens" placeholder="0=不限制">
+                <p class="config-hint">单次回复的最大字数</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── 作息与主动关怀（合并） ── -->
+          <div class="config-section">
+            <div class="config-section-header">
+              <div class="config-icon">💤</div>
+              <h3>作息与主动关怀</h3>
+              <p class="config-desc">免打扰时段、主动消息频率</p>
+            </div>
+            <div class="config-grid">
+              <div class="config-item">
+                <label class="config-label">主动关怀</label>
+                <label class="toggle-switch">
+                  <input type="checkbox" class="config-input" data-key="proactive_enabled">
+                  <span class="toggle-slider"></span>
+                </label>
+                <p class="config-hint">允许 Bot 主动发消息</p>
+              </div>
+              <div class="config-item">
+                <label class="config-label">免打扰时段</label>
+                <div style="display:flex;gap:8px;align-items:center">
+                  <input type="number" class="config-input" data-key="quiet_hours_start" min="0" max="23" value="23" style="width:70px"> 点 ～
+                  <input type="number" class="config-input" data-key="quiet_hours_end" min="0" max="23" value="8" style="width:70px"> 点
+                </div>
+              </div>
+              <div class="config-item">
+                <label class="config-label">主动间隔(分钟)</label>
+                <input type="number" class="config-input" data-key="proactive_interval_min" min="5" max="1440" value="60">
+              </div>
+              <div class="config-item">
+                <label class="config-label">未回复暂停阈值</label>
+                <input type="number" class="config-input" data-key="proactive_max_unanswered" min="1" max="20" value="3">
+                <p class="config-hint">连续不回则暂停主动，防骚扰</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── 功能开关 ── -->
+          <div class="config-section">
+            <div class="config-section-header">
+              <div class="config-icon">🔘</div>
+              <h3>功能开关</h3>
+              <p class="config-desc">开启或关闭各模块</p>
+            </div>
+            <div class="config-grid">
+              <div class="config-item">
+                <label class="config-label">命理咨询</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="counseling_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">成长反思</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="growth_engine_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">梦境/预感</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="dream_engine_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">命理暗盘</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="darkchannel_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">社交关系图谱</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="social_graph_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">群黑话学习</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="group_slang_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">角色收集</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="character_collection_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">对话检视</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="conversation_inspection_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">新闻阅读</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="news_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">主动搜索</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="proactive_search_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">塔罗占卜</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="tarot_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">健康生活指导</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="health_enabled"><span class="toggle-slider"></span></label>
+              </div>
+              <div class="config-item">
+                <label class="config-label">危机识别红线</label>
+                <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="counseling_crisis_enabled"><span class="toggle-slider"></span></label>
+                <p class="config-hint">识别自我伤害意念并注入危机支持</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── 高级参数（默认折叠） ── -->
+          <details class="config-collapse">
+            <summary><span class="config-icon">🔧</span> 高级参数 <span class="collapse-hint">点击展开</span></summary>
+            <div style="margin-top:16px">
+              <div class="config-grid">
+                <div class="config-item">
+                  <label class="config-label">群聊回复概率</label>
+                  <input type="range" class="config-input range" data-key="group_reply_probability" min="0" max="1" step="0.05" value="0.3">
+                  <div class="range-display" data-for="group_reply_probability">30%</div>
+                </div>
+                <div class="config-item">
+                  <label class="config-label">暗盘缓存时间(秒)</label>
+                  <input type="number" class="config-input" data-key="darkchannel_cache_ttl" min="0" value="3600">
+                </div>
+                <div class="config-item">
+                  <label class="config-label">主动冷却(小时)</label>
+                  <input type="number" class="config-input" data-key="proactive_cooldown_hours" min="1" max="720" value="72">
+                </div>
+                <div class="config-item">
+                  <label class="config-label">黑话置信度阈值</label>
+                  <input type="range" class="config-input range" data-key="slang_confidence_threshold" min="0" max="1" step="0.05" value="0.5">
+                  <div class="range-display" data-for="slang_confidence_threshold">50%</div>
+                </div>
+                <div class="config-item">
+                  <label class="config-label">对话权重阈值</label>
+                  <input type="range" class="config-input range" data-key="weight_threshold" min="0" max="1" step="0.05" value="0.45">
+                  <div class="range-display" data-for="weight_threshold">45%</div>
+                </div>
+                <div class="config-item">
+                  <label class="config-label">每用户最大记忆数</label>
+                  <input type="number" class="config-input" data-key="memory_max_per_user" min="50" max="2000" value="400">
+                </div>
+                <div class="config-item">
+                  <label class="config-label">每天 Token 限额</label>
+                  <input type="number" class="config-input" data-key="daily_token_limit" placeholder="0=不限制">
+                </div>
+                <div class="config-item">
+                  <label class="config-label">Token 监控</label>
+                  <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="token_monitor_enabled"><span class="toggle-slider"></span></label>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <!-- ── 命理后台（默认折叠） ── -->
+          <details class="config-collapse">
+            <summary><span class="config-icon">🔮</span> 命理后台 <span class="collapse-hint">每月静默计算用户命盘</span></summary>
+            <div style="margin-top:16px">
+              <div class="config-item" style="margin-bottom:12px">
+                <label class="config-label">命理服务地址</label>
+                <input type="text" class="config-input" data-key="mingbu_api_url" placeholder="http://localhost:2963">
+                <p class="config-hint">命理后端地址；Docker 容器内请填宿主机 IP 或同网络容器名（如 http://192.168.1.50:2963 或 http://mingbu:2963），留空则用环境变量 MINGBU_API_URL</p>
+              </div>
+              <div class="config-item" style="margin-bottom:12px">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                  <button type="button" class="btn btn-secondary" id="mingbuTestBtn">🔌 测试命理后端</button>
+                  <span class="svc-test-status" id="mingbuTestStatus"></span>
+                </div>
+                <p class="config-hint">向命理服务地址发起 /api/health 探测，确认后端是否可连通</p>
+              </div>
+              <div class="config-grid">
+                <div class="config-item">
+                  <label class="config-label">启用后台关注</label>
+                  <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="background_watch_enabled"><span class="toggle-slider"></span></label>
+                  <p class="config-hint">每月计算用户大运/流年/流月，蒸馏为后台注记</p>
+                </div>
+                <div class="config-item">
+                  <label class="config-label">定时计算</label>
+                  <input type="text" class="config-input" data-key="background_watch_cron" placeholder="0 7 1 * *">
+                  <p class="config-hint">cron 表达式，默认每月1日早7点</p>
+                </div>
+                <div class="config-item">
+                  <label class="config-label">情绪触发阈值</label>
+                  <input type="range" class="config-input range" data-key="background_watch_emotion_threshold" min="0" max="1" step="0.05" value="0.6">
+                  <div class="range-display" data-for="background_watch_emotion_threshold">60%</div>
+                  <p class="config-hint">用户话语情绪达此阈值即实时重算，0=关闭</p>
+                </div>
+                <div class="config-item">
+                  <label class="config-label">情绪触发冷却(分钟)</label>
+                  <input type="number" class="config-input" data-key="background_watch_emotion_cooldown_min" min="5" max="10080" value="360">
+                </div>
+                <div class="config-item">
+                  <label class="config-label">默认命理方法</label>
+                  <select class="config-input" data-key="background_watch_method_default">
+                    <option value="auto">自动（有出生→命盘，否则卜卦）</option>
+                    <option value="ziwei">紫微斗数</option>
+                    <option value="bazi">八字</option>
+                    <option value="liuyao">六爻</option>
+                    <option value="qimen">奇门遁甲</option>
+                    <option value="meihua">梅花易数</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <!-- ── 自我进化（默认折叠） ── -->
+          <details class="config-collapse">
+            <summary><span class="config-icon">🧬</span> 自我进化 <span class="collapse-hint">每晚提炼对话事实</span></summary>
+            <div style="margin-top:16px">
+              <div class="config-grid">
+                <div class="config-item">
+                  <label class="config-label">启用自我进化</label>
+                  <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="self_evolution_enabled"><span class="toggle-slider"></span></label>
+                  <p class="config-hint">每晚把对话提炼为显性事实写回记忆（有 LLM 成本）</p>
+                </div>
+                <div class="config-item">
+                  <label class="config-label">定时执行</label>
+                  <input type="text" class="config-input" data-key="self_evolution_cron" placeholder="0 4 * * *">
+                  <p class="config-hint">cron 表达式，默认凌晨4点</p>
+                </div>
+              </div>
+            </div>
+          </details>
+
+          <!-- ===== 渠道与服务配置（能力服务商 + 外部服务，相邻分区） ===== -->
+          <details class="config-collapse config-group" open id="channelServices">
+            <summary><span class="config-icon">🔗</span> 渠道与服务配置 <span class="collapse-hint">能力服务商（拉取模式）· 外部服务</span></summary>
+            <p class="config-desc svc-region-intro">两类配置都决定「用哪个服务商 / 渠道」：① 能力服务商为各内部能力指定 AstrBot 已配置服务商；② 外部服务为每个外部 API 选服务商或填自有凭据。两者留空均走 AstrBot 默认。</p>
+
+            <!-- ① 能力服务商（拉取模式） -->
+            <div class="config-section svc-subpanel">
+              <div class="config-section-header">
+                <div class="config-icon">🎯</div>
+                <h3>能力服务商（拉取模式）</h3>
+                <p class="config-desc mc-head-desc">两种模式互斥（切换即清空另一项），对应<b>两个独立渠道</b>：<b>① 拉取模式</b>＝只选 AstrBot 已配置的服务商（或手输 Provider ID），模型跟随该服务商默认；<b>② 自定义</b>＝填自有 Key / 接口，模型从顶部「模型统一配置」区拉取的列表中选择，独立调用不依赖 AstrBot 服务商。留空均走 AstrBot 默认。</p>
+                <button type="button" class="btn btn-ghost mc-refetch-btn" id="mcRefetchProvidersBtn" title="重新从 AstrBot 拉取已配置的服务商列表">🔄 重新拉取服务商</button>
+              </div>
+              <div class="mc-dash-config">
+                <label class="config-label">AstrBot Dashboard 地址（可选）</label>
+                <input type="text" class="config-input" data-key="astrbot_dashboard_url" placeholder="留空＝本机 127.0.0.1:6185">
+                <label class="config-label">AstrBot API Key（可选）</label>
+                <input type="text" class="config-input" data-key="astrbot_api_key" placeholder="留空＝本机默认">
+                <p class="config-hint">命灵通过该地址拉取「能力服务商」列表（结构稳定、明确带 Provider ID）。公网/自签证书地址可填，命灵会自动跳过证书验证。</p>
+              </div>
+              <div class="config-grid" id="mcRolesGrid"></div>
+            </div>
+
+            <!-- ② 外部服务 -->
+            <div class="config-section svc-subpanel">
+              <div class="config-section-header">
+                <div class="config-icon">🔌</div>
+                <h3>外部服务</h3>
+                <p class="config-desc svc-intro">每个服务可二选一，两种模式互斥（切换即清空另一项）：<b>① 拉取模式</b>＝在「服务商 (AstrBot Provider)」里选 AstrBot 已配置的服务商，<b>留空则自动沿用 AstrBot 默认服务商</b>；<b>② 自定义</b>＝填自有 Key / 接口 / 模型，下拉选中「已拉取的模型」后<b>以该模型独立调用，不再依赖默认服务商的默认模型</b>。模型名下拉仅决定调用哪个模型，服务商（或 Key/接口）决定走哪个渠道。</p>
+              </div>
+            <datalist id="svcProviderList"></datalist>
+            <datalist id="mcModelList"></datalist>
+            <div class="svc-grid">
+
+              <div class="svc-card" data-svc="tts" data-provider-key="provider_tts" data-custom-keys="tts_api_key,tts_api_base,tts_model">
+                <div class="svc-card-head">
+                  <div class="svc-title"><span class="svc-icon">🎤</span><div><div class="svc-name">语音合成 (TTS)</div><div class="svc-sub">文本转语音消息</div></div></div>
+                  <label class="toggle-switch" title="启用 TTS"><input type="checkbox" class="config-input" data-key="tts_enabled"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="svc-mode"><div class="mode-toggle"><button type="button" class="mode-btn" data-mode="pull">🔗 拉取模式</button><button type="button" class="mode-btn" data-mode="custom">✏️ 自定义</button></div></div>
+                <div class="svc-extras">
+                  <div class="svc-extra"><label class="toggle-switch"><input type="checkbox" class="config-input" data-key="tts_auto_for_long_text"><span class="toggle-slider"></span></label><span>长文本自动语音</span></div>
+                  <div class="svc-extra"><label class="toggle-switch"><input type="checkbox" class="config-input" data-key="tts_emotion_routing_enabled"><span class="toggle-slider"></span></label><span>情绪音色路由</span></div>
+                </div>
+                <div class="mode-panel" data-mode="pull">
+                  <label class="config-label">服务商 (AstrBot Provider)</label>
+                  <input type="text" class="config-input" data-key="provider_tts" list="svcProviderList" placeholder="选择或输入服务商 ID">
+                  <p class="config-hint">从 AstrBot「设置 → 模型服务」已配置的服务商中选择；留空＝默认服务商。</p>
+                </div>
+                <div class="mode-panel" data-mode="custom">
+                  <label class="config-label">API Key</label><input type="text" class="config-input" data-key="tts_api_key" placeholder="仅连通性测试 / 音色试听用">
+                  <label class="config-label">接口地址</label><input type="text" class="config-input" data-key="tts_api_base" placeholder="如 https://api.siliconflow.cn/v1（后端自动拼 /audio/speech）">
+                  <label class="config-label">模型名</label><input type="text" class="config-input" data-key="tts_model" data-cats="tts" data-role="tts" placeholder="如 FunAudioLLM/CosyVoice-300M">
+                  <p class="config-hint">运行时语音合成走 AstrBot TTS provider；此凭据仅供「测试」按钮与面板音色试听直连调用。</p>
+                </div>
+                <div class="svc-voice">
+                  <label class="config-label">音色 (voice)</label>
+                  <!-- v4.9.3：三源合一。数据层仍是带 data-key 的 select（config
+                       读写机制零改动，视觉隐藏）；表现层为自定义下拉面板——
+                       原生 option 无法内嵌按钮，展开后每行音色自带 🔊 试听。 -->
+                  <select class="config-input tts-voice-data" data-key="tts_voice" aria-hidden="true" tabindex="-1">
+                    <option value="">留空＝接口默认（SiliconFlow 为 alex）</option>
+                  </select>
+                  <div class="voice-dd" id="voiceDropdown">
+                    <div class="voice-dd-trigger" id="voiceDdTrigger" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">
+                      <span class="voice-dd-label" id="voiceDdLabel">留空＝接口默认（SiliconFlow 为 alex）</span>
+                    </div>
+                    <div class="voice-dd-panel" id="voiceDdPanel" hidden></div>
+                  </div>
+                  <p class="config-hint">留空＝接口默认（SiliconFlow 为 alex）。合成走 AstrBot Provider，该音色透传给 provider.get_audio。展开下拉可试听每个音色（🔊）；点行即选中并保存。</p>
+                </div>
+                <div class="svc-chunk">
+                  <label class="config-label">单段最大字数</label>
+                  <input type="number" class="config-input" data-key="tts_max_chunk_chars" min="50" max="1000" step="10" placeholder="200">
+                  <p class="config-hint">长文本朗读按句切分为多段语音逐条发送，避免单条超过微信 60 秒限制（报错 45007）。语速偏慢的音色请调小。</p>
+                </div>
+              </div>
+
+              <div class="svc-card" data-svc="stt" data-provider-key="provider_stt">
+                <div class="svc-card-head">
+                  <div class="svc-title"><span class="svc-icon">🎧</span><div><div class="svc-name">语音识别 (STT)</div><div class="svc-sub">语音消息转写为文字</div></div></div>
+                  <label class="toggle-switch" title="启用 STT"><input type="checkbox" class="config-input" data-key="stt_enabled"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="mode-panel" data-mode="pull">
+                  <label class="config-label">服务商 (AstrBot Provider)</label>
+                  <input type="text" class="config-input" data-key="provider_stt" list="svcProviderList" placeholder="选择或输入服务商 ID">
+                  <p class="config-hint">STT 完全由 AstrBot STT 服务商提供（在 AstrBot 主设置里配置）。留空＝默认 STT 服务商。</p>
+                </div>
+              </div>
+
+              <div class="svc-card" data-svc="embedding" data-provider-key="provider_embedding" data-custom-keys="embedding_api_key,embedding_api_base,embedding_model">
+                <div class="svc-card-head">
+                  <div class="svc-title"><span class="svc-icon">🧠</span><div><div class="svc-name">语义召回 (Embedding)</div><div class="svc-sub">记忆语义向量召回</div></div></div>
+                  <label class="toggle-switch" title="启用 Embedding"><input type="checkbox" class="config-input" data-key="embedding_enabled"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="svc-mode"><div class="mode-toggle"><button type="button" class="mode-btn" data-mode="pull">🔗 拉取模式</button><button type="button" class="mode-btn" data-mode="custom">✏️ 自定义</button></div></div>
+                <div class="mode-panel" data-mode="pull">
+                  <label class="config-label">服务商 (AstrBot Provider)</label>
+                  <input type="text" class="config-input" data-key="provider_embedding" list="svcProviderList" placeholder="选择或输入服务商 ID">
+                  <p class="config-hint">留空则自动探测 AstrBot 原生 / 社区 Embedding 服务商。</p>
+                </div>
+                <div class="mode-panel" data-mode="custom">
+                  <label class="config-label">API Key</label><input type="text" class="config-input" data-key="embedding_api_key" placeholder="仅连通性测试用">
+                  <label class="config-label">接口地址</label><input type="text" class="config-input" data-key="embedding_api_base" placeholder="如 https://api.siliconflow.cn/v1">
+                  <label class="config-label">模型名</label><input type="text" class="config-input" data-key="embedding_model" data-cats="embedding" data-role="embedding" placeholder="如 BAAI/bge-m3">
+                  <p class="config-hint">运行时语义召回走 AstrBot Embedding provider；此凭据仅供「测试」按钮直连验证。</p>
+                </div>
+              </div>
+
+              <div class="svc-card" data-svc="rerank" data-provider-key="provider_rerank" data-custom-keys="rerank_api_key,rerank_api_base,rerank_model">
+                <div class="svc-card-head">
+                  <div class="svc-title"><span class="svc-icon">🔃</span><div><div class="svc-name">相关性重排 (Rerank)</div><div class="svc-sub">记忆相关性二次排序</div></div></div>
+                  <label class="toggle-switch" title="启用 Rerank"><input type="checkbox" class="config-input" data-key="rerank_enabled"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="svc-mode"><div class="mode-toggle"><button type="button" class="mode-btn" data-mode="pull">🔗 拉取模式</button><button type="button" class="mode-btn" data-mode="custom">✏️ 自定义</button></div></div>
+                <div class="mode-panel" data-mode="pull">
+                  <label class="config-label">服务商 (AstrBot Provider)</label>
+                  <input type="text" class="config-input" data-key="provider_rerank" list="svcProviderList" placeholder="选择或输入服务商 ID">
+                  <p class="config-hint">留空则自动探测 AstrBot 首个 Rerank 服务商。</p>
+                </div>
+                <div class="mode-panel" data-mode="custom">
+                  <label class="config-label">API Key</label><input type="text" class="config-input" data-key="rerank_api_key" placeholder="仅连通性测试用">
+                  <label class="config-label">接口地址</label><input type="text" class="config-input" data-key="rerank_api_base" placeholder="如 https://api.siliconflow.cn/v1（后端自动拼 /rerank）">
+                  <label class="config-label">模型名</label><input type="text" class="config-input" data-key="rerank_model" data-cats="rerank" data-role="rerank" placeholder="如 BAAI/bge-reranker-v2-m3">
+                  <p class="config-hint">运行时记忆重排走 AstrBot Rerank provider；此凭据仅供「测试」按钮直连验证。</p>
+                </div>
+              </div>
+
+              <div class="svc-card" data-svc="vision" data-provider-key="provider_image_vision" data-custom-keys="image_vision_api_key,image_vision_api_base,image_vision_model">
+                <div class="svc-card-head">
+                  <div class="svc-title"><span class="svc-icon">👁️</span><div><div class="svc-name">图片视觉 (Vision)</div><div class="svc-sub">图片理解与转述</div></div></div>
+                  <label class="toggle-switch" title="启用图片转述"><input type="checkbox" class="config-input" data-key="image_vision_enabled"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="svc-mode"><div class="mode-toggle"><button type="button" class="mode-btn" data-mode="pull">🔗 拉取模式</button><button type="button" class="mode-btn" data-mode="custom">✏️ 自定义</button></div></div>
+                <div class="mode-panel" data-mode="pull">
+                  <label class="config-label">服务商 (AstrBot Provider)</label>
+                  <input type="text" class="config-input" data-key="provider_image_vision" list="svcProviderList" placeholder="选择或输入服务商 ID">
+                  <p class="config-hint">需具备多模态能力的 LLM 服务商；留空＝主回复服务商。</p>
+                </div>
+                <div class="mode-panel" data-mode="custom">
+                  <label class="config-label">API Key</label><input type="text" class="config-input" data-key="image_vision_api_key" placeholder="仅连通性测试用">
+                  <label class="config-label">接口地址</label><input type="text" class="config-input" data-key="image_vision_api_base" placeholder="如 https://api.openai.com/v1">
+                  <label class="config-label">模型名</label><input type="text" class="config-input" data-key="image_vision_model" data-cats="vision" data-role="image_vision" placeholder="如 gpt-4o、claude-3.5-sonnet">
+                  <p class="config-hint">运行时图片转述走 AstrBot LLM provider（provider_image_vision 或主回复）；此凭据仅供「测试」按钮直连验证。</p>
+                </div>
+              </div>
+
+              <div class="svc-card" data-svc="merged" data-provider-key="provider_merged_forward" data-custom-keys="merged_forward_api_key,merged_forward_api_base,merged_forward_model">
+                <div class="svc-card-head">
+                  <div class="svc-title"><span class="svc-icon">📨</span><div><div class="svc-name">合并转发转述</div><div class="svc-sub">合并消息自然摘要</div></div></div>
+                </div>
+                <div class="svc-mode"><div class="mode-toggle"><button type="button" class="mode-btn" data-mode="pull">🔗 拉取模式</button><button type="button" class="mode-btn" data-mode="custom">✏️ 自定义</button></div></div>
+                <div class="mode-panel" data-mode="pull">
+                  <label class="config-label">服务商 (AstrBot Provider)</label>
+                  <input type="text" class="config-input" data-key="provider_merged_forward" list="svcProviderList" placeholder="选择或输入服务商 ID">
+                  <p class="config-hint">合并转述专用，避免串风格；留空＝主回复服务商。</p>
+                </div>
+                <div class="mode-panel" data-mode="custom">
+                  <label class="config-label">API Key</label><input type="text" class="config-input" data-key="merged_forward_api_key" placeholder="覆盖主回复凭据">
+                  <label class="config-label">接口地址</label><input type="text" class="config-input" data-key="merged_forward_api_base" placeholder="如 https://api.openai.com/v1">
+                  <label class="config-label">模型名</label><input type="text" class="config-input" data-key="merged_forward_model" data-cats="chat" data-role="merged_forward" placeholder="留空用默认">
+                  <p class="config-hint">下拉可选「已拉取的模型」；选中即以该模型独立调用，不依赖默认服务商。</p>
+                </div>
+              </div>
+
+              <div class="svc-card" data-svc="interpret" data-provider-key="mingbu_interpret_provider" data-custom-keys="mingbu_interpret_api_key,mingbu_interpret_base_url,mingbu_interpret_model">
+                <div class="svc-card-head">
+                  <div class="svc-title"><span class="svc-icon">🤖</span><div><div class="svc-name">命理 AI 解读</div><div class="svc-sub">调用外部服务生成命理洞察</div></div></div>
+                  <label class="toggle-switch" title="启用 AI 解读"><input type="checkbox" class="config-input" data-key="mingbu_interpret_enabled"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="svc-mode"><div class="mode-toggle"><button type="button" class="mode-btn" data-mode="pull">🔗 拉取模式</button><button type="button" class="mode-btn" data-mode="custom">✏️ 自定义</button></div></div>
+                <div class="mode-panel" data-mode="pull">
+                  <label class="config-label">服务商 (AstrBot Provider)</label>
+                  <input type="text" class="config-input" data-key="mingbu_interpret_provider" list="svcProviderList" placeholder="选择或输入服务商 ID">
+                  <p class="config-hint">如 deepseek/kimi/gemini/claude；留空＝默认服务商。</p>
+                </div>
+                <div class="mode-panel" data-mode="custom">
+                  <label class="config-label">API Key</label><input type="text" class="config-input" data-key="mingbu_interpret_api_key" placeholder="留空使用环境变量">
+                  <label class="config-label">接口地址</label><input type="text" class="config-input" data-key="mingbu_interpret_base_url" placeholder="自定义服务商必填">
+                  <label class="config-label">模型名</label><input type="text" class="config-input" data-key="mingbu_interpret_model" data-cats="chat" data-role="mingbu_interpret" placeholder="留空用默认">
+                  <p class="config-hint">下拉可选「已拉取的模型」；选中即以该模型独立调用，不依赖默认服务商。</p>
+                </div>
+              </div>
+
+            </div>
+            </div>
+          </details>
+
+<!-- ── 世界观（默认折叠） ── -->
+          <details class="config-collapse">
+            <summary><span class="config-icon">🌍</span> 世界观适配 <span class="collapse-hint">现代概念转译为角色世界观内说法</span></summary>
+            <div style="margin-top:16px">
+              <div class="config-grid">
+                <div class="config-item">
+                  <label class="config-label">启用世界观适配</label>
+                  <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="worldview_enabled"><span class="toggle-slider"></span></label>
+                </div>
+                <div class="config-item">
+                  <label class="config-label">自动匹配世界观</label>
+                  <label class="toggle-switch"><input type="checkbox" class="config-input" data-key="auto_worldview_match"><span class="toggle-slider"></span></label>
+                  <p class="config-hint">根据当前角色自动切换世界观风格</p>
+                </div>
+                <div class="config-item full-width">
+                  <label class="config-label">自定义世界观 (JSON)</label>
+                  <textarea class="config-input" data-key="custom_worldview_json" rows="4" placeholder='{"self_name":"名字","world_name":"世界","memory":"记忆","dream":"梦境","search":"搜索","news":"新闻","image_vision":"看图","merged_forward":"转发","creation":"创作","voice":"语音","screen_peek":"瞥见"}'></textarea>
+                  <p class="config-hint">覆盖预设世界观映射，留空则用预设</p>
+                </div>
+              </div>
+            </div>
+          </details>
+        </section>
+
+        <!-- ═══ 对话检视 ═══ -->
+        <section id="tab-conversation" class="tab-content">
+          <div class="panel-header-row">
+            <h2>💬 对话检视与学习</h2>
+            <div class="conversation-tabs">
+              <button class="conv-tab active" data-conv="all">全部对话</button>
+              <button class="conv-tab" data-conv="weighted">⭐ 高权重</button>
+              <button class="conv-tab" data-conv="learned">已学知识</button>
+              <button class="conv-tab" data-conv="stats">统计概览</button>
+            </div>
+            <button class="btn btn-secondary" id="convRefresh">🔄 刷新</button>
+          </div>
+          <div class="conv-filter" id="convFilterAll">
+            <select class="conv-user-select" id="convUserSelect"><option value="">所有用户...</option></select>
+            <select class="conv-type-select" id="convTypeSelect">
+              <option value="">所有类型</option>
+              <option value="user">用户消息</option>
+              <option value="bot">Bot 回复</option>
+            </select>
+            <label class="conv-checkbox"><input type="checkbox" id="convLearnedOnly"> 仅显示已学习</label>
+            <div class="search-box" style="flex:1;max-width:280px">
+              <input type="text" placeholder="搜索对话内容..." id="convSearch">
+              <span class="search-icon">🔍</span>
+            </div>
+          </div>
+          <div class="conv-panel active" data-conv-panel="all">
+            <div class="conv-list" id="convList"><div class="loading-spinner"></div></div>
+            <div class="conv-pagination" id="convPagination"></div>
+          </div>
+          <div class="conv-panel" data-conv-panel="weighted">
+            <div class="conv-weighted-toolbar">
+              <div class="conv-weighted-info">⭐ 高权重对话：基于情感/亲密度/自我披露/重要话题等综合评分</div>
+              <div class="conv-weighted-actions">
+                <select class="conv-user-select" id="convWeightedUserSelect"><option value="">选择用户...</option></select>
+                <button class="conv-btn" id="convExtractBtn">📥 抽取到记忆</button>
+                <button class="conv-btn" id="convReweightBtn">🔄 重新计算权重</button>
+              </div>
+            </div>
+            <div class="conv-list" id="convWeightedList">
+              <div class="empty-state"><div class="empty-icon">⭐</div><p>选择用户查看高权重对话</p></div>
+            </div>
+          </div>
+          <div class="conv-panel" data-conv-panel="learned">
+            <div class="knowledge-list" id="knowledgeList">
+              <div class="empty-state"><div class="empty-icon">📚</div><p>还没有学习的知识</p></div>
+            </div>
+          </div>
+          <div class="conv-panel" data-conv-panel="stats">
+            <div class="grid-2" id="convStatsGrid">
+              <div class="panel">
+                <div class="panel-header"><h3>📊 对话统计</h3></div>
+                <div class="conv-stats" id="convStats"><div class="loading-spinner"></div></div>
+              </div>
+              <div class="panel">
+                <div class="panel-header"><h3>👥 活跃用户</h3></div>
+                <div class="conv-user-rank" id="convUserRank"><div class="loading-spinner"></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ 资源监控 ═══ -->
+        <section id="tab-tokens" class="tab-content">
+          <div class="panel-header-row">
+            <h2>💰 资源监控</h2>
+          </div>
+          <div class="grid-2">
+            <div class="panel">
+              <div class="panel-header"><h3>📊 用量统计</h3></div>
+              <div class="token-summary" id="tokenSummary"><div class="loading-spinner"></div></div>
+            </div>
+            <div class="panel">
+              <div class="panel-header"><h3>📈 任务分布</h3></div>
+              <div class="task-chart" id="taskChart"><div class="loading-spinner"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ 依赖诊断 ═══ -->
+        <section id="tab-diagnostics" class="tab-content">
+          <div class="panel-header-row">
+            <h2>🩺 依赖诊断</h2>
+            <button class="btn btn-secondary" id="refreshDiagnostics">刷新诊断</button>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><h3>能力初始化状态</h3></div>
+            <div id="capabilityStatus" class="diagnostics-list"><div class="loading-spinner"></div></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><h3>服务配置检查</h3></div>
+            <div class="diagnostic-actions">
+              <button class="btn btn-secondary diagnostic-test" data-service="provider">Provider</button>
+              <button class="btn btn-secondary diagnostic-test" data-service="tts">TTS</button>
+              <button class="btn btn-secondary diagnostic-test" data-service="stt">STT</button>
+              <button class="btn btn-secondary diagnostic-test" data-service="embedding">Embedding</button>
+              <button class="btn btn-secondary diagnostic-test" data-service="rerank">Rerank</button>
+            </div>
+            <div id="connectivityResults" class="diagnostics-list"><div class="empty-text">点击上方按钮开始检查</div></div>
+          </div>
+        </section>
+
+        <!-- v4.9.0：原「音色库」独立 Tab（tab-tts）已删除，音色库合并至核心配置的 TTS 服务卡片 -->
+
+      </main>
+
+      <footer class="footer">
+        <!-- 版本号由 app.js 从 /stats 接口回填（后端 _version.py 为唯一数据源）；
+             此处字面量仅在接口不可用时作为降级占位，需随发布同步（已由测试钉死）。 -->
+        <div class="footer-left">命灵·AI伴侣 v<span id="version">4.9.9</span></div>
+        <div class="footer-right">用心守护每一段羁绊 ✨</div>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div id="modalRoot"></div>
+    <script type="module" src="./app.js?v=4.9.9"></script>
+  </body>
+</html>
