@@ -281,7 +281,7 @@ class DiagnosticsApiMixin:
                     # 注意：provider_router 在插件根目录，必须用三点半相对导入
                     # （与 diagnostics.py:12 的模块级导入一致；单点会去找
                     #  stars/apis/provider_router 导致 ModuleNotFoundError）。
-                    from ... import provider_router
+                    from ...provider_router import _direct_dashscope_tts
                     from .tts_voices import _DASHSCOPE_VOICE_NAMES
 
                     diag_voice = cfg.get("tts_voice") or "Cherry"
@@ -291,7 +291,7 @@ class DiagnosticsApiMixin:
                             f"[mingbu.diag] 音色 {diag_voice} 不在 DashScope 官方列表，测试改用 Cherry"
                         )
                         diag_voice = "Cherry"
-                    audio = await provider_router._direct_dashscope_tts(
+                    audio = await _direct_dashscope_tts(
                         str(body.get("text") or "命灵连通性测试"),
                         key, model, voice=diag_voice,
                     )
@@ -305,8 +305,10 @@ class DiagnosticsApiMixin:
                 # STT 完全走 AstrBot STT provider，插件不再持有直连凭据。
                 # 连通性测试改为验证「AstrBot 里是否已配置可用的 STT provider」：
                 # 有 provider 即视为 STT 服务就绪（真实转写由 AstrBot 运行时完成）。
-                from ... import provider_router  # 模块级引用（get_stt_provider 所在）
-                provider = await provider_router.get_stt_provider(
+                from ...provider_router import (
+                    get_stt_provider,  # 模块级引用（get_stt_provider 所在）
+                )
+                provider = await get_stt_provider(
                     getattr(self, "context", None),
                     cfg.get("provider_stt") or "",
                 )

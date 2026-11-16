@@ -25,7 +25,7 @@ from typing import Dict, List, Optional
 from astrbot.api import logger
 
 from .context_budget import estimate_tokens
-from .feature_flags import FeatureFlags, MODE_OBSERVE
+from .feature_flags import FeatureFlags
 
 
 @dataclass

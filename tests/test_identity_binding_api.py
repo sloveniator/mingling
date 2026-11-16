@@ -7,7 +7,6 @@
 platform_user_id。聊天侧只提供只读查询，不允许普通用户改绑定（防身份劫持）。
 """
 import pytest
-
 from test_admin_api import build_star, call, payload_of
 
 

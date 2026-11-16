@@ -10,12 +10,12 @@ import asyncio
 
 import pytest
 
+from integration.context_gateway import ContextGateway
 from integration.feature_flags import (
     MODE_ENHANCE,
     MODE_OBSERVE,
     FeatureFlags,
 )
-from integration.context_gateway import ContextGateway
 
 
 def _run(coro):

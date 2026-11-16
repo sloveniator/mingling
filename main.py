@@ -899,7 +899,7 @@ class MingbuPlugin(StarAdmin):
             lines.append(f"平台：{platform}")
         lines.append(f"长期记忆身份：{unified}")
         if is_bound and bound_to:
-            lines.append(f"\u2705 已与主身份并到一起，跨平台共享长期记忆。")
+            lines.append("\u2705 已与主身份并到一起，跨平台共享长期记忆。")
         else:
             lines.append(
                 "本账号独立保存记忆（不同平台互不相通）。"

@@ -311,6 +311,7 @@ def test_send_tts_45007_mid_segment_partial_success():
 
     from astrbot_plugin_mingbu import provider_router
     from astrbot_plugin_mingbu.main import MingbuPlugin, _send_voice_with_backoff
+
     from tests.test_admin_api import FakeContext
 
     plugin = MingbuPlugin(FakeContext(), {
@@ -350,6 +351,7 @@ def test_send_tts_45007_all_segments_not_sent():
 
     from astrbot_plugin_mingbu import provider_router
     from astrbot_plugin_mingbu.main import MingbuPlugin, _send_voice_with_backoff
+
     from tests.test_admin_api import FakeContext
 
     plugin = MingbuPlugin(FakeContext(), {
@@ -616,6 +618,7 @@ def test_tts_max_chunk_clamped_to_150():
     import inspect
 
     from astrbot_plugin_mingbu.tts_config import load_tts_settings
+
     from main import TTS_MAX_CHUNK_CHARS, MingbuPlugin, _split_tts_chunks
 
     assert TTS_MAX_CHUNK_CHARS == 150, "默认单段上限应为 150（60s 内安全）"

@@ -12,8 +12,8 @@ import asyncio
 
 import pytest
 
-from star_mixins.llm_hook import _inject_gateway_extras
 from integration.context_budget import DEFAULT_BUDGET, estimate_tokens
+from star_mixins.llm_hook import _inject_gateway_extras
 
 
 def _run(coro):

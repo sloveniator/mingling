@@ -717,8 +717,7 @@ class ProactiveEngine:
         if not session_id or not self.plugin.context:
             return
         try:
-            sessions = await self._ensure_sessions()
-            meta = sessions.get(session_id, {})
+            await self._ensure_sessions()
             name = self.plugin.persona.name if self.plugin.persona else "灵犀"
             # 初始角色信息（若有）：欢迎语里点出"你身边现在是谁"，
             # 让用户第一眼就知道自己在收集玩法里、有了第一个角色。

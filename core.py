@@ -307,8 +307,8 @@ class MingbuCore:
             # 过早构建会拿到 None。flags 只读 config，本步不改变任何生产行为
             # （gateway 尚未接入主链路，observe 模式下 should_modify_request=False）。
             try:
-                from .integration.feature_flags import FeatureFlags
                 from .integration.context_gateway import ContextGateway
+                from .integration.feature_flags import FeatureFlags
                 self.flags = FeatureFlags.from_config(cfg)
                 self.gateway = ContextGateway(self, flags=self.flags)
                 logger.debug(

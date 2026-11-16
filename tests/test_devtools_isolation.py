@@ -30,6 +30,11 @@ PLUGIN_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 仅供开发/测试使用，绝不可出现在运行时 import 闭包里。
 DEV_ONLY_TOP_LEVEL = {"devtools", "tests", "prototype"}
 
+# 其中「必须存在」的目录。prototype/ 已在 .gitignore（第 29 行）且从未入库，
+# 属可选开发目录——全新克隆必然没有，不能强制要求存在，否则该护栏在干净
+# 检出上恒失败。devtools/ 与 tests/ 是版本控制内的真实目录，必须存在。
+REQUIRED_DEV_DIRS = {"devtools", "tests"}
+
 # 运行时入口。AstrBot 只加载 main.py，其余全是它的传递依赖。
 RUNTIME_ENTRY = "main"
 
@@ -188,11 +193,15 @@ class TestRuntimeSourcesAreClean:
         )
 
     def test_dev_only_dirs_still_exist(self):
-        """清单不能腐坏：目录被改名后本护栏会静默失效。"""
-        missing = [d for d in DEV_ONLY_TOP_LEVEL
+        """清单不能腐坏：版本控制内的开发目录被改名后本护栏会静默失效。
+
+        只校验 REQUIRED_DEV_DIRS（gitignore 内的可选目录如 prototype/ 不强制，
+        否则干净检出于恒失败——它本就不入库）。
+        """
+        missing = [d for d in REQUIRED_DEV_DIRS
                    if not os.path.isdir(os.path.join(PLUGIN_DIR, d))]
         assert not missing, (
-            f"DEV_ONLY_TOP_LEVEL 里的目录不存在：{missing}。"
+            f"REQUIRED_DEV_DIRS 里的目录不存在：{missing}。"
             f"若已改名/删除，请同步更新本文件的清单"
         )
 

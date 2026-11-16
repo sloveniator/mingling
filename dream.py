@@ -204,10 +204,9 @@ class DreamEngine:
 
         # 2026-09-22（P2 梦池制）：夜梦池硬预算——超容淘汰 + 过期兜底清除
         try:
-            evicted = await self._trim_dream_pool(user_id)
+            await self._trim_dream_pool(user_id)
         except Exception as e:
             logger.warning(f"[mingbu.dream] {user_id} 梦池清理失败(忽略): {e}")
-            evicted = 0
 
         # 2026-09-22（P1）：只强化非梦记忆（recent 已排除 DREAM，此处双保险）
         keep_ids = [m.id for m in recent[:6] if m.type != DREAM]

@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import asyncio
+
 import pytest
 
 from core import MingbuCore, MingbuStar, get_core
@@ -293,12 +294,26 @@ def test_core_reexports_hook_symbols():
     """``from core import CrisisHook, HookChain`` 等旧写法仍可用。"""
     from core import (  # noqa: F401
         BlessingHook as _B,
+    )
+    from core import (
         CharacterHook as _C,
+    )
+    from core import (
         CounselingHook as _Co,
+    )
+    from core import (
         CrisisHook as _Cr,
+    )
+    from core import (
         HookChain as _HC,
+    )
+    from core import (
         HookProcessor as _HP,
+    )
+    from core import (
         PersonaHook as _P,
+    )
+    from core import (
         get_default_chain as _gdc,
     )
 

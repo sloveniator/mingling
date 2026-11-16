@@ -7,7 +7,6 @@
 本测试锁定「observe 切换后无需重启即生效」的端到端契约。
 """
 import pytest
-
 from test_admin_api import build_star
 
 
@@ -60,6 +59,7 @@ def test_injection_behavior_follows_mode_switch():
     断言注入行为随 observe/enhance 切换变化——不只 flags.mode 字段。
     """
     import asyncio
+
     from star_mixins.llm_hook import _inject_gateway_extras
 
     star = _init(build_star())
@@ -93,8 +93,8 @@ def test_injection_behavior_follows_mode_switch():
 
 def call_save_config(star, data):
     import asyncio
-    from conftest import (StubRequest, reset_current_request,
-                          set_current_request)
+
+    from conftest import StubRequest, reset_current_request, set_current_request
 
     async def _run():
         token = set_current_request(StubRequest("POST", {}, data))

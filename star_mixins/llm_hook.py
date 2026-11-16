@@ -19,8 +19,7 @@ from ..counseling import CounselingPrompts, detect_crisis
 from ..emotion_detect import detect_emotion, emotion_to_weight
 from ..hooks import get_default_chain
 from ..integration.context_budget import DEFAULT_BUDGET, clip_to_budget, estimate_tokens
-from ..memory_core import classify_reaction
-from ..memory_core import SCOPE_GROUP, SCOPE_PRIVATE
+from ..memory_core import SCOPE_GROUP, SCOPE_PRIVATE, classify_reaction
 from ..metrics import record_failure
 from ..util import (
     inject_text_part,

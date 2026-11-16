@@ -16,7 +16,6 @@ v4.8.141 起所有 LLM/STT/TTS/Embedding/Rerank 请求完全交由 AstrBot Provi
 """
 from __future__ import annotations
 
-import asyncio
 import base64
 import inspect
 from typing import Optional
@@ -1003,7 +1002,7 @@ async def _direct_dashscope_tts(text: str, api_key: str, model: str, voice: str 
     try:
         # 设置 API key
         dashscope.api_key = api_key
-        
+
         # 调用 MultiModalConversation
         kwargs = {
             "model": model,

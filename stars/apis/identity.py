@@ -16,6 +16,7 @@ platform_user_id 做绑定/解绑。聊天侧**只**提供只读查询命令（�
 from __future__ import annotations
 
 from integration.identity_resolver import KV_BINDING_PREFIX, bind_identity
+
 from ._base import (
     api_endpoint,
     error_response,

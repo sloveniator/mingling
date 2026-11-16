@@ -12,6 +12,11 @@ description = "AstrBot 神秘 AI 朋友插件（含暗盘能力）"
 requires-python = ">=3.9"
 dependencies = ["aiohttp>=3.9,<4.0"]
 
+[project.optional-dependencies]
+# 测试工具链：运行时不需要，仅本地/CI 跑 pytest 用。
+# aiohttp 是唯一运行依赖（见 dependencies），pytest/pytest-asyncio 是测试期依赖。
+dev = ["pytest>=8", "pytest-asyncio>=0.23"]
+
 [tool.ruff]
 line-length = 100
 target-version = "py39"
@@ -35,6 +40,9 @@ version = {attr = "_version.VERSION"}
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+# 异步用例均显式标注 @pytest.mark.asyncio（4 个文件共 19 个），strict 模式与之精确匹配，
+# 且避免 auto 模式误把非 asyncio 的 async fixture/函数当协程跑。声明后标准 `pytest` 即可运行。
+asyncio_mode = "strict"
 
 [tool.mypy]
 # 注：运行目标为 Python 3.9（AstrBot 环境），但 mypy 本体要求类型检查基线 >=3.10。
@@ -44,3 +52,22 @@ python_version = "3.10"
 ignore_missing_imports = true
 warn_unused_ignores = false
 disallow_untyped_defs = false
+
+# 本项目为「扁平根模块 + 子包」混合布局：AstrBot 直接加载根 main.py（根无 __init__.py），
+# 而 stars/apis 等子目录内部用包级相对导入回溯根模块。mypy 默认按磁盘目录推导模块名，
+# 会把 core/feature_flags.py 与 integration/feature_flags.py 判为同名冲突，
+# 也无法把 bare `from ... import x` 静态解析到无 __init__ 的根。
+# 以下三项让 mypy 把「.」当作显式包基，扁平模块与子包统一按路径解析。
+mypy_path = "."
+explicit_package_bases = true
+namespace_packages = true
+
+# 【mypy 基线现状（2026-11-16）】配置修复后 mypy 已能完整运行（187 源文件），
+# 暴露 200 个**既有**类型问题，非本轮引入。构成：attr-defined 150（主体，star_mixins
+# 等动态 Mixin 裸类靠 getattr/try-except 防御式访问 self.persona/proactive 等宿主注入
+# 属性，运行时由 main.py MingbuPlugin 的 MRO 提供，mypy 静态不可见——属动态 Mixin
+# 模式固有盲区，非真 bug，彻底修复需引入 Protocol/显式标注）；assignment 21、
+# arg-type 7、var-annotated 8 等。排除 devtools(测试桩)/tests 后业务代码 160 个。
+# 当前 mypy 不在 CI 门禁（ci.yml 仅 ruff+pytest）。**接入门禁需先治理上述技术债**，
+# 建议渐进式：先修 assignment/arg-type 等 ~40 个候选真问题，attr-defined 用
+# Protocol/基类标注收口，再行纳入 CI。本阶段仅完成「mypy 可运行 + 基线量化」，未清债。

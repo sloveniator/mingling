@@ -11,8 +11,8 @@ import asyncio
 import pytest
 
 from integration.context_budget import (
-    estimate_tokens,
     clip_to_budget,
+    estimate_tokens,
 )
 from integration.context_gateway import ContextGateway, EnhancementContext
 from integration.feature_flags import (

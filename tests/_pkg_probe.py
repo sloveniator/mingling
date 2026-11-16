@@ -1,4 +1,6 @@
-import sys, types, importlib
+import importlib
+import sys
+import types
 
 pkg = "astrbot_plugin_mingbu"
 BASE = r"E:\Programs\命灵\astrbot_mingbu"

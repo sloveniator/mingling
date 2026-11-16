@@ -31,8 +31,8 @@ from .identity import IdentityApiMixin as IdentityApiMixin
 from .overview import OverviewApiMixin as OverviewApiMixin
 from .slang import SlangApiMixin as SlangApiMixin
 from .system import SystemApiMixin as SystemApiMixin
-from .worldview import WorldviewApiMixin as WorldviewApiMixin
 from .tts_voices import TtsVoicesApiMixin as TtsVoicesApiMixin
+from .worldview import WorldviewApiMixin as WorldviewApiMixin
 
 __all__ = [
     "MAX_LIST_USERS",

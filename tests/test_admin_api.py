@@ -20,6 +20,12 @@ import json
 import pytest
 from conftest import StubRequest, StubResponse, reset_current_request, set_current_request
 
+# 路由前缀以 constants.PLUGIN_NAME 为唯一真源，避免插件改名（mingbu→mingling）
+# 后测试硬编码前缀与实际路由不符而集体腐坏。
+from constants import PLUGIN_NAME as _PLUGIN_NAME
+
+_ROUTES_PREFIX = f"/{_PLUGIN_NAME}"
+
 # ══════════════════════════════════════════════════════════════
 # 测试脚手架
 # ══════════════════════════════════════════════════════════════
@@ -182,13 +188,13 @@ class TestReadOnlyEndpoints:
     @pytest.mark.parametrize("endpoint", GET_ENDPOINTS_NO_ARGS)
     def test_empty_store_does_not_crash(self, star, endpoint):
         """空库是真实的首次安装状态，不允许抛异常。"""
-        handler = star.context.routes[f"/astrbot_plugin_mingbu/{endpoint}"][0]
+        handler = star.context.routes[f"{_ROUTES_PREFIX}/{endpoint}"][0]
         resp = call(handler)
         assert isinstance(payload_of(resp), dict)
 
     @pytest.mark.parametrize("endpoint", GET_ENDPOINTS_NO_ARGS)
     def test_seeded_store_returns_200(self, seeded, endpoint):
-        handler = seeded.context.routes[f"/astrbot_plugin_mingbu/{endpoint}"][0]
+        handler = seeded.context.routes[f"{_ROUTES_PREFIX}/{endpoint}"][0]
         resp = call(handler)
         status = resp.status_code if isinstance(resp, StubResponse) else 200
         assert status == 200, payload_of(resp)

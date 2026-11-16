@@ -15,6 +15,7 @@ def _make_tts_plugin(extra_cfg=None):
     from unittest.mock import patch
 
     from astrbot_plugin_mingbu import provider_router
+
     from main import MingbuPlugin
     from tests.test_admin_api import FakeContext
 

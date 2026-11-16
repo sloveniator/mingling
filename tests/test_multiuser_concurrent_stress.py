@@ -17,7 +17,6 @@ import pytest
 
 from tests.test_admin_api import build_star
 
-
 MSG = "今天面试完了，说实话有点焦虑，我一直很想去这家公司，但又怕自己不够好"
 
 
@@ -80,7 +79,7 @@ def test_multi_user_no_cross_contamination():
         uid = f"user_{i:02d}"
         logs = insp._cache.get(uid)
         assert logs, f"用户 {uid} 的对话上下文缓存为空（未写入）"
-        joined = "\n".join(getattr(l, "content", "") for l in logs)
+        joined = "\n".join(getattr(entry, "content", "") for entry in logs)
         # 该用户分桶内不得出现其他用户的专属标记
         for j in range(N_USERS):
             if j != i:

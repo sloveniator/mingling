@@ -16,7 +16,6 @@ AstrBot 原生页两种可能触发路径，分别实测：
 import asyncio
 
 import pytest
-
 from test_admin_api import build_star
 
 

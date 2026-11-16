@@ -21,7 +21,6 @@ class _KVPlugin:
 
 # ---- to_brief_with_refs：注入文本带不透明短码 ----
 def test_brief_with_refs_assigns_codes():
-    core = MemoryCore(_KVPlugin())
     mems = [
         Memory("u1", SEMANTIC, "内容甲"),
         Memory("u1", SEMANTIC, "内容乙"),
@@ -38,7 +37,6 @@ def test_brief_with_refs_assigns_codes():
 
 def test_brief_refs_codes_are_opaque():
     """短码不含真实 id，防泄漏。"""
-    core = MemoryCore(_KVPlugin())
     mem = Memory("u1", SEMANTIC, "秘密内容")
     mapping = {}
     text = MemoryCore.to_brief_with_refs([mem], 50, mapping)
