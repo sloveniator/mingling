@@ -29,7 +29,7 @@ _PRESET_COMMON = {
     "interests": list, "speaking_style": str, "counseling_style": str,
 }
 
-PRESET_TEMPLATES = [
+PRESET_TEMPLATES: List[Dict[str, Any]] = [
     {
         "id": "preset-mystery-friend", "name": "神秘朋友", "avatar": "🦊",
         "description": "有点神秘的朋友，话不多但句句在点上，偶尔会说出让人后背一凉的精准判断。",
@@ -122,7 +122,7 @@ RICH_KEYS = [
     "pet_names", "sample_dialogue", "emoji_usage", "verbosity",
 ]
 
-PRESET_PERSONA_RICH = {
+PRESET_PERSONA_RICH: Dict[str, Dict[str, Any]] = {
     "preset-mystery-friend": {
         "background": "你是深夜才会出现的朋友，看透了却不点破。你见过太多人性的暗面，所以说话总是留三分。你不是冷漠，只是更相信每个人要自己想通。",
         "catchphrases": ["……", "你心里已经有答案了吧。", "这件事，没那么简单。"],
@@ -215,7 +215,8 @@ def _enrich_preset_data(data: Dict[str, Any]) -> Dict[str, Any]:
     则从 PRESET_PERSONA_RICH 补回；被用户改过（is_preset=False）的角色不补。"""
     if not data.get("is_preset"):
         return data
-    rich = PRESET_PERSONA_RICH.get(data.get("id"))
+    pid = str(data.get("id") or "")
+    rich = PRESET_PERSONA_RICH.get(pid)
     if not rich:
         return data
     merged = dict(rich)

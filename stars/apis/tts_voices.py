@@ -20,6 +20,7 @@ v4.9.0 重构：音色库**数据**已迁至插件根 ``tts_config.py``（唯一
 from __future__ import annotations
 
 import base64
+from typing import Optional
 
 from astrbot.api import logger
 
@@ -54,7 +55,7 @@ class TtsVoicesApiMixin:
 
     @api_endpoint("拉取 TTS 音色列表")
     @with_json
-    async def api_tts_voices(self, body: dict = None):
+    async def api_tts_voices(self, body: Optional[dict] = None):
         """拉取 TTS 音色列表。
 
         请求体：``{"provider": "dashscope"|"cosyvoice", "api_key": str,
@@ -105,7 +106,7 @@ class TtsVoicesApiMixin:
 
     @api_endpoint("TTS 试听")
     @with_json
-    async def api_tts_preview(self, body: dict = None):
+    async def api_tts_preview(self, body: Optional[dict] = None):
         """TTS 试听：合成短文本并返回音频数据。
 
         请求体：``{"text": str, "voice": str, "provider": "dashscope"|"cosyvoice", "api_key": str}``
@@ -171,7 +172,7 @@ class TtsVoicesApiMixin:
 
     @api_endpoint("TTS 试听长文本")
     @with_json
-    async def api_tts_preview_long(self, body: dict = None):
+    async def api_tts_preview_long(self, body: Optional[dict] = None):
         """TTS 试听长文本（≤1600 token，约 1200 字）。
 
         请求体：同 api_tts_preview，但 text 可更长。

@@ -97,7 +97,7 @@ def coerce_by_schema(payload: Dict[str, Any],
             if stype == "bool":
                 coerced[key] = _to_bool(raw)
             elif stype == "int":
-                value = int(raw)
+                value: float = int(raw)
                 err = _check_range(key, value, spec)
                 if err:
                     errors.append(err)

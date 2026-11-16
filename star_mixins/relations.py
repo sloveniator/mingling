@@ -11,7 +11,7 @@ star_mixins/relations.py -- 用户关系读写与活跃用户索引维护
 """
 import json
 import time
-from typing import List
+from typing import Dict, List, Optional, Set
 
 from astrbot.api import logger
 
@@ -27,6 +27,11 @@ _KNOWN_UIDS_TTL = 60
 
 class RelationshipMixin:
     """用户关系读写与活跃用户索引维护。"""
+
+    # 运行时由宿主 MingbuPlugin（MRO）或方法内 hasattr/None 检查惰性初始化的
+    # 动态属性；这里仅作类型声明（字符串注解，不产生运行时绑定），供 mypy 静态识别。
+    _bond_cache: "Dict[str, Bond]"
+    _known_uids: "Optional[Set[str]]"
 
     async def _get_relationship(self, uid: str) -> Relationship:
         if uid in self._rel_cache:

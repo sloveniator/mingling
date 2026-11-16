@@ -120,10 +120,10 @@ class ConversationLog:
         self.timestamp = now_bj().isoformat()
         self.learned = False
         self.notes = ""
-        self.tags = []
+        self.tags: List[str] = []
         self.importance = 0.0  # 0-1，由学习系统打分
         self.weight = 0.0  # 自动权重评分
-        self.weight_factors = {}  # 权重因素详情
+        self.weight_factors: Dict[str, float] = {}  # 权重因素详情
 
     def to_dict(self) -> dict:
         return {

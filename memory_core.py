@@ -251,7 +251,8 @@ class Memory:
         )
         # 老数据无 scope 键：保守回退 private（私聊秘密绝不在群里复述）。
         # 仅接受合法值，非法/缺失一律 private。
-        m.scope = d.get("scope") if d.get("scope") in ALL_SCOPES else DEFAULT_SCOPE
+        raw_scope = d.get("scope")
+        m.scope = raw_scope if raw_scope in ALL_SCOPES else DEFAULT_SCOPE
         # 元数据回退（2.0 第二阶段）：老数据无这些键时给安全默认值。
         # confidence 缺失回退为「模型推测」档（不假装用户明确表达过）。
         try:

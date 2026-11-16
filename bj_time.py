@@ -23,13 +23,13 @@
 """
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone, tzinfo
 
 try:
     # 生产容器已确认自带 tzdata（/usr/share/zoneinfo/Asia/Shanghai）
     from zoneinfo import ZoneInfo
 
-    BJ_TZ = ZoneInfo("Asia/Shanghai")
+    BJ_TZ: tzinfo = ZoneInfo("Asia/Shanghai")
 except Exception:  # pragma: no cover -- 极端环境退化为固定 UTC+8（中国无夏令时）
     BJ_TZ = timezone(timedelta(hours=8))
 

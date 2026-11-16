@@ -5,7 +5,7 @@ stt.py -- 语音转文字（STT）辅助
 所有失败路径都优雅降级（返回 None），不会中断主对话流程。
 """
 import inspect
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from astrbot.api import logger
 
@@ -59,7 +59,7 @@ def collect_record_audio_urls(chain) -> List[str]:
     return urls
 
 
-def strip_record_components(chain):
+def strip_record_components(chain) -> "List[Any]":
     """从消息链移除全部语音（Record）组件，返回新列表。
 
     语音转写成功后调用：音频已转成文字，若 Record 仍留在链里，

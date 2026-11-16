@@ -474,9 +474,9 @@ def build_ziwei_knowledge_grounding(chart: Dict[str, Any], max_chars: int = 6000
         # 古籍应证（命宫/身宫主星 + 关键辅星）
         classic_lines: List[str] = []
         for name in core_stars:
-            hit = lookup_concept(name)
-            if hit:
-                classic_lines.append(hit)
+            concept_text = lookup_concept(name)
+            if concept_text:
+                classic_lines.append(concept_text)
         if classic_lines:
             sec = ["【紫微知识库 · 古籍应证】"]
             sec.extend(classic_lines)

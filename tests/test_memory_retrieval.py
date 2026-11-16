@@ -24,7 +24,7 @@ class _KVPlugin:
     async def put_kv_data(self, key, value):
         self.store[key] = value
 
-    _config = {}
+    _config: dict = {}
 
 
 def _run(coro):

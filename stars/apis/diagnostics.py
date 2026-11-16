@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import time
+from typing import Any, Dict
 
 from astrbot.api import logger
 
@@ -270,6 +271,7 @@ class DiagnosticsApiMixin:
                 api_base=base, api_key=_mask_secret(key), model=model,
                 mode="configuration_check",
             ))
+        extra: Dict[str, Any] = {}
         try:
             if service == "tts":
                 # DashScope Qwen TTS 模型使用 MultiModalConversation API，

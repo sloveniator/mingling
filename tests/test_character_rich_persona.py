@@ -13,6 +13,7 @@ tests/test_character_rich_persona.py -- 角色人设富字段 + 终端切换通�
 运行：python -m pytest tests/test_character_rich_persona.py -v
 """
 import asyncio
+from typing import Tuple
 
 from character_collection import THRESHOLDS, CharacterCollection
 from character_pool import (
@@ -40,7 +41,7 @@ class _Harness:
         self.kv[key] = value
 
 
-async def _build_harness() -> _Harness:
+async def _build_harness() -> Tuple["_Harness", str]:
     h = _Harness()
     h.character_pool = CharacterPool(h)
     await h.character_pool.initialize()

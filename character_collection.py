@@ -6,7 +6,7 @@ character_collection.py -- 角色收集玩法
 当用户触发特定台词时，解锁隐藏款第七个角色。
 """
 import random
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from .character_pool import HIDDEN_PRESET_ID, VISIBLE_PRESETS
 
@@ -115,7 +115,7 @@ class CharacterCollection:
                 coll["last_recommend_index"] = recommend_idx
                 coll["recommend_count"] += 1
                 await self._save_collection(uid, coll)
-                char_info = next((t for t in VISIBLE_PRESETS if t["id"] == new_char_id), {})
+                char_info: Dict[str, Any] = next((t for t in VISIBLE_PRESETS if t["id"] == new_char_id), {})
                 return {
                     "ok": True,
                     "character_id": new_char_id,

@@ -10,7 +10,7 @@ star_mixins/profile.py -- 用户档案与出生信息：读写、参数归一、
 import json
 import uuid
 from datetime import date, timedelta
-from typing import Optional
+from typing import Any, Optional
 
 from astrbot.api import logger
 from astrbot.api.event import AstrMessageEvent
@@ -21,7 +21,7 @@ from ..formatters import _clock_to_shichen
 from ..util import spawn
 
 
-def _normalize_birth_hour(hour: object) -> object:
+def _normalize_birth_hour(hour: Any) -> Any:
     """将 profile.birth.hour 归一到命理服务端期望的 0–11 地支索引（0=子…11=亥）。
 
     - 0–11：已是地支索引（插件内部口径，与 ``_clock_to_shichen`` / ``_shichen_name``
@@ -32,7 +32,7 @@ def _normalize_birth_hour(hour: object) -> object:
     - 其余异常值：原样返回，交由服务端校验，保持既有失败语义。
     """
     try:
-        h = int(hour)  # type: ignore[arg-type]
+        h = int(hour)
     except (TypeError, ValueError):
         return hour
     if 0 <= h <= 11:

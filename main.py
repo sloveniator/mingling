@@ -25,7 +25,7 @@ import re
 import sys
 import time
 import traceback
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 # 兼容 verify_hooks.py 等独立脚本直接运行时的绝对导入
 _PLUGIN_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -527,7 +527,7 @@ class MingbuPlugin(StarAdmin):
         """
         uids = await uids_await
         total = len(uids)
-        summary = {
+        summary: Dict[str, Any] = {
             "date": time.strftime("%Y-%m-%d"),
             "task": task,
             "total": total,
@@ -2405,7 +2405,7 @@ class MingbuPlugin(StarAdmin):
             # 注入为可识别文本，让后续 LLM 看到
             note = f"[语音转写] {transcript}"
             msg_obj = getattr(event, "message_obj", None)
-            chain = getattr(msg_obj, "message", None)
+            chain: Optional[list] = getattr(msg_obj, "message", None)
             if chain is not None:
                 try:
                     chain.append(Plain(note))
@@ -2418,7 +2418,7 @@ class MingbuPlugin(StarAdmin):
             try:
                 from .stt import strip_record_components
                 kept = strip_record_components(chain)
-                if isinstance(kept, list) and len(kept) != len(chain):
+                if chain is not None and isinstance(kept, list) and len(kept) != len(chain):
                     chain[:] = kept
             except Exception:
                 pass

@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import base64
 import inspect
-from typing import Optional
+from typing import Any, Optional
 
 import aiohttp
 from astrbot.api import logger
@@ -379,7 +379,7 @@ class ProviderRouter:
         """
         self._provider_cache.clear()
 
-    async def llm_request(self, task_type: str, req, model: str = None):
+    async def llm_request(self, task_type: str, req, model: Optional[str] = None):
         """使用指定 Provider 发起 LLM 请求。
 
         ``model`` 为调用方显式指定的模型名（来自配置中的 ``{task}_model``，
@@ -613,7 +613,7 @@ async def list_llm_providers(ctx) -> list:
     return (await list_llm_providers_with_diagnostics(ctx))["providers"]
 
 
-async def list_llm_providers_with_diagnostics(ctx, plugin_cfg: dict = None) -> dict:
+async def list_llm_providers_with_diagnostics(ctx, plugin_cfg: Optional[dict] = None) -> dict:
     """枚举 AstrBot 已配置的 LLM 服务商，并返回可定位失败根因的诊断信息。
 
     返回结构::
@@ -635,7 +635,7 @@ async def list_llm_providers_with_diagnostics(ctx, plugin_cfg: dict = None) -> d
     具体原因（AstrBot 未就绪 / 接口结构变更 / 确实没配服务商等），而不是一句
     模糊的「未配置任何服务商」。
     """
-    diagnostics = {
+    diagnostics: dict[str, Any] = {
         "context_available": bool(ctx),
         "provider_manager_available": False,
         "strategies": [],
@@ -820,7 +820,7 @@ def parse_rerank_indices(result) -> list:
     return idxs
 
 
-async def rerank_memory_list(provider, query: str, mems: list, plugin_cfg: dict = None) -> list:
+async def rerank_memory_list(provider, query: str, mems: list, plugin_cfg: Optional[dict] = None) -> list:
     """用 rerank provider 对记忆列表按 query 重排，返回重排后的新列表。
 
     v4.8.141 起完全走 AstrBot rerank provider，插件不再持有直连凭据。
@@ -900,7 +900,7 @@ async def _direct_openai_rerank(query: str, documents: list, api_key: str, api_b
     return []
 
 
-def _resolve_tts_voice(voice: str, api_base: str, model: str) -> str:
+def _resolve_tts_voice(voice: Optional[str], api_base: str, model: str) -> str:
     """把用户/默认音色名解析为接口实际接受的形式。
 
     - 已含 ":"（如 "模型:音色"）原样返回；
@@ -957,7 +957,7 @@ async def _direct_dashscope_rerank(query: str, documents: list, api_key: str, mo
         if raise_error:
             raise
         return []
-    results = []
+    results: list = []
     if isinstance(data, dict):
         results = ((data.get("output") or {}).get("results")) or []
     idxs = [int(r.get("index", i)) for i, r in enumerate(results) if isinstance(r, dict)]
@@ -1003,8 +1003,8 @@ async def _direct_dashscope_tts(text: str, api_key: str, model: str, voice: str 
         # 设置 API key
         dashscope.api_key = api_key
 
-        # 调用 MultiModalConversation
-        kwargs = {
+        # 调用 MultiModalConversation（值混合 str/None/bool，统一标注为 Any）
+        kwargs: dict[str, Any] = {
             "model": model,
             "messages": None,
             "api_key": api_key,
@@ -1043,7 +1043,7 @@ async def _direct_dashscope_tts(text: str, api_key: str, model: str, voice: str 
         raise
 
 
-async def _direct_openai_speech(text: str, api_key: str, api_base: str, model: str, *, voice: str = None, response_format: str = "mp3", raise_error: bool = False) -> bytes:
+async def _direct_openai_speech(text: str, api_key: str, api_base: str, model: str, *, voice: Optional[str] = None, response_format: str = "mp3", raise_error: bool = False) -> bytes:
     """通过 OpenAI 兼容的 /audio/speech 接口直接合成语音。
 
     voice 兼容两种取值：
@@ -1084,8 +1084,8 @@ async def _direct_openai_chat(
     api_key: str,
     api_base: str,
     model: str,
-    image_urls: list = None,
-    system: str = None,
+    image_urls: Optional[list] = None,
+    system: Optional[str] = None,
     raise_error: bool = False,
 ) -> str:
     """通过 OpenAI 兼容的 /chat/completions 直接对话，支持多模态图片。
@@ -1094,10 +1094,10 @@ async def _direct_openai_chat(
                  为 False（默认）时静默返回空串，由调用方决定是否降级。
     """
     url = api_base.rstrip("/") + "/chat/completions"
-    content = [{"type": "text", "text": prompt}]
+    content: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
     for u in (image_urls or []):
         content.append({"type": "image_url", "image_url": {"url": u}})
-    messages = []
+    messages: list[dict[str, Any]] = []
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": content})
@@ -1298,7 +1298,7 @@ def _classify_model(mid: str) -> list:
     return cats
 
 
-async def fetch_model_catalog(base_url: str, api_key: str = "", extra_headers: dict = None) -> dict:
+async def fetch_model_catalog(base_url: str, api_key: str = "", extra_headers: Optional[dict] = None) -> dict:
     """拉取 OpenAI 兼容 /models 列表，按能力粗分类，并尽力附价格。
 
     每个模型附带 ``price`` 字段：``{"in","out","unit":"USD/1M","source"}``，
@@ -1410,7 +1410,7 @@ async def get_embedding_provider(ctx, provider_id: str = "") -> object:
     return None
 
 
-async def embed_texts(provider, texts: list, plugin_cfg: dict = None) -> list:
+async def embed_texts(provider, texts: list, plugin_cfg: Optional[dict] = None) -> list:
     """把文本列表向量化，返回 List[List[float]]。失败/缺 provider 返回 []。
 
     v4.8.141 起完全走 AstrBot embedding provider，插件不再持有直连凭据。

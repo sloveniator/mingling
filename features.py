@@ -13,7 +13,7 @@ builder 一律在函数体内做懒导入，避免 features 模块在导入期�
 """
 from __future__ import annotations
 
-from typing import Callable, Dict
+from typing import Callable, Dict, Optional
 
 
 class _Feature:
@@ -25,7 +25,7 @@ class _Feature:
     """
 
     def __init__(self, name: str, build: Callable, enabled_if: Callable[["dict"], bool],
-                 config_key: str = None, default: bool = True):
+                 config_key: Optional[str] = None, default: bool = True):
         self.name = name
         self.build = build
         self.enabled_if = enabled_if
@@ -36,8 +36,8 @@ class _Feature:
 _REGISTRY: Dict[str, _Feature] = {}
 
 
-def feature(name: str, *, config_key: str = None, default: bool = True,
-            enabled_if: Callable[["dict"], bool] = None):
+def feature(name: str, *, config_key: Optional[str] = None, default: bool = True,
+            enabled_if: Optional[Callable[["dict"], bool]] = None):
     """能力登记装饰器工厂。
 
     用法::
@@ -55,12 +55,16 @@ def feature(name: str, *, config_key: str = None, default: bool = True,
             （如 news 同时看 news_enabled / proactive_search_enabled）。
     """
     def decorator(build: Callable) -> Callable:
+        # _is_enabled 在两个分支产生不同实现（单一开关 / 复合条件），
+        # 先声明统一类型避免分支间重定义冲突。
+        _is_enabled: Callable[["dict"], bool]
         if enabled_if is None:
             key, dflt = config_key, default
 
-            def _is_enabled(cfg: "dict") -> bool:
+            def _is_enabled_impl(cfg: "dict") -> bool:
                 return cfg.get(key, dflt) if key else dflt
 
+            _is_enabled = _is_enabled_impl
             introspect_key = config_key
         else:
             _is_enabled = enabled_if

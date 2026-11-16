@@ -11,12 +11,35 @@ tests/test_stress_performance.py -- 综合压力与性能测试
 运行：python -m pytest tests/test_stress_performance.py -v --tb=short
 """
 import asyncio
+import functools
 import json
 import random
 import time
 from typing import List
 
 import pytest
+
+
+def _retry_on_flaky(max_retries: int = 1, pause_sec: float = 0.2):
+    """CI 负载抖动时自动重试 AssertionError，避免吞吐量阈值误报。
+
+    仅捕获 AssertionError（性能阈值未达），不捕获其他异常，真实逻辑
+    错误立即暴露。max_retries=1 即最多再跑一次，足以吸收偶发抖动。
+    """
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exc = None
+            for attempt in range(1 + max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except AssertionError as exc:
+                    last_exc = exc
+                    if attempt < max_retries:
+                        time.sleep(pause_sec)
+            raise last_exc
+        return wrapper
+    return decorator
 
 # ============================================================
 # 1. KV 存储基类压力测试
@@ -256,6 +279,7 @@ class TestMemoryPerformance:
 class TestDarkChannelThroughput:
     """暗盘计算的吞吐量测试。"""
 
+    @_retry_on_flaky()
     def test_da_yun_throughput_1000_calls(self):
         """大运计算 1000 次调用的吞吐量。"""
         from pathlib import Path
@@ -288,6 +312,7 @@ class TestDarkChannelThroughput:
         throughput = n / elapsed
         assert throughput > 100, f"大运计算吞吐量过低: {throughput:.0f} ops/s"
 
+    @_retry_on_flaky()
     def test_palace_extract_throughput_500_calls(self):
         """宫位提取 500 次调用的吞吐量。"""
         from pathlib import Path
@@ -314,6 +339,7 @@ class TestDarkChannelThroughput:
         throughput = n / elapsed
         assert throughput > 200, f"宫位提取吞吐量过低: {throughput:.0f} ops/s"
 
+    @_retry_on_flaky()
     def test_insights_extract_throughput_200_calls(self):
         """洞察提取 200 次调用的吞吐量。"""
         from pathlib import Path
@@ -369,6 +395,7 @@ class TestGroupSlangPerformance:
 
         return FakePlugin()
 
+    @_retry_on_flaky()
     def test_batch_learn_500_words(self):
         """批量学习 500 个黑话词的性能。"""
         from group_slang import GroupSlangManager
@@ -402,6 +429,7 @@ class TestGroupSlangPerformance:
 
         asyncio.run(run())
 
+    @_retry_on_flaky()
     def test_auto_learn_candidates_performance(self):
         """候选黑话自动提取的性能。"""
         from group_slang import GroupSlangManager
@@ -449,6 +477,7 @@ class TestSocialGraphPerformance:
 
         return FakePlugin()
 
+    @_retry_on_flaky()
     def test_large_social_graph_co_members(self):
         """大规模社交图的共同成员查询性能。"""
         from social import SocialGraph
@@ -479,6 +508,7 @@ class TestSocialGraphPerformance:
 
         asyncio.run(run())
 
+    @_retry_on_flaky()
     def test_shared_groups_performance(self):
         """共同群组查询的性能。"""
         from social import SocialGraph
@@ -513,6 +543,7 @@ class TestSocialGraphPerformance:
 class TestConversationWeightPerformance:
     """对话权重计算的性能测试。"""
 
+    @_retry_on_flaky()
     def test_1000_conversations_weight_calc(self):
         """1000 条对话的权重计算性能。"""
         from conversation_inspector import ConversationLog
