@@ -166,7 +166,7 @@ def install_astrbot_stub() -> None:
             def debug(self, *a, **k): pass
             def error(self, *a, **k): pass
 
-        _api.logger = _Logger()
+        _api.logger = _Logger()  # type: ignore[attr-defined]
 
         # ── 消息组件 ──
         # 真实 AstrBot 里这些类定义在 astrbot.api.message_components，
@@ -255,14 +255,14 @@ def install_astrbot_stub() -> None:
             def set_result_content_type(self, *_a, **_k):
                 return self
 
-        _event.MessageEventResult = MessageEventResult
+        _event.MessageEventResult = MessageEventResult  # type: ignore[attr-defined]
 
         class EventMessageType:
             FRIEND_MESSAGE = "friend_message"
             GROUP_MESSAGE = "group_message"
             ALL = "all"
 
-        _event.EventMessageType = EventMessageType
+        _event.EventMessageType = EventMessageType  # type: ignore[attr-defined]
 
         class _Filter:
             """AstrBot ``@filter.*`` 装饰器族的最小忠实桩。
@@ -385,7 +385,7 @@ def install_astrbot_stub() -> None:
                     raise AttributeError(name)
                 return self._identity
 
-        _event.filter = _Filter()
+        _event.filter = _Filter()  # type: ignore[attr-defined]
         # 真实 AstrBot 中 EventMessageType 可通过 filter.EventMessageType 取到
         # （插件代码即如此访问：getattr(filter, 'EventMessageType', None)）。
         # 必须挂在 filter 实例上，否则 _EMT_ALL / _EMT_PRIVATE 解析为 None，
@@ -408,7 +408,7 @@ def install_astrbot_stub() -> None:
             def get_sender_name(self): return "测试用户"
             def stop_event(self): pass
 
-        _event.AstrMessageEvent = AstrMessageEvent
+        _event.AstrMessageEvent = AstrMessageEvent  # type: ignore[attr-defined]
 
         class ProviderRequest:
             def __init__(self, prompt="", session_id="", **kw):
@@ -434,14 +434,14 @@ def install_astrbot_stub() -> None:
         # 对 Context.llm_request() 的返回值判否，TTS 分支静默走空。
         ProviderResponse = LLMResponse
 
-        _provider.ProviderRequest = ProviderRequest
-        _provider.ProviderResponse = ProviderResponse
-        _provider.LLMResponse = LLMResponse
+        _provider.ProviderRequest = ProviderRequest  # type: ignore[attr-defined]
+        _provider.ProviderResponse = ProviderResponse  # type: ignore[attr-defined]
+        _provider.LLMResponse = LLMResponse  # type: ignore[attr-defined]
         # 不同 AstrBot 版本 LLMResponse 的位置不同，源码写了 api → core 的
         # 兜底链；两条路径都指向同一个类，兜底命中时行为一致。
-        _core_provider.LLMResponse = LLMResponse
-        _core_provider.ProviderRequest = ProviderRequest
-        _core.provider = _core_provider
+        _core_provider.LLMResponse = LLMResponse  # type: ignore[attr-defined]
+        _core_provider.ProviderRequest = ProviderRequest  # type: ignore[attr-defined]
+        _core.provider = _core_provider  # type: ignore[attr-defined]
 
         class Context:
             def __init__(self): pass
@@ -462,15 +462,15 @@ def install_astrbot_stub() -> None:
             async def terminate(self): pass
             def register_llm_tool(self, *a, **k): pass
 
-        _star.Context = Context
-        _star.Star = Star
+        _star.Context = Context  # type: ignore[attr-defined]
+        _star.Star = Star  # type: ignore[attr-defined]
 
-        _astrbot.api = _api
-        _astrbot.core = _core
-        _api.event = _event
-        _api.message_components = _components
-        _api.provider = _provider
-        _api.star = _star
+        _astrbot.api = _api  # type: ignore[attr-defined]
+        _astrbot.core = _core  # type: ignore[attr-defined]
+        _api.event = _event  # type: ignore[attr-defined]
+        _api.message_components = _components  # type: ignore[attr-defined]
+        _api.provider = _provider  # type: ignore[attr-defined]
+        _api.star = _star  # type: ignore[attr-defined]
 
         sys.modules["astrbot"] = _astrbot
         sys.modules["astrbot.api"] = _api
@@ -484,13 +484,13 @@ def install_astrbot_stub() -> None:
     # ── astrbot.api.web：原 conftest 缺失的部分 ──
     if "astrbot.api.web" not in sys.modules:
         _web = types.ModuleType("astrbot.api.web")
-        _web.request = _RequestProxy()
-        _web.json_response = _json_response
-        _web.error_response = _error_response
-        _web.Request = StubRequest
-        _web.Response = StubResponse
+        _web.request = _RequestProxy()  # type: ignore[attr-defined]
+        _web.json_response = _json_response  # type: ignore[attr-defined]
+        _web.error_response = _error_response  # type: ignore[attr-defined]
+        _web.Request = StubRequest  # type: ignore[attr-defined]
+        _web.Response = StubResponse  # type: ignore[attr-defined]
         sys.modules["astrbot.api.web"] = _web
-        sys.modules["astrbot.api"].web = _web
+        sys.modules["astrbot.api"].web = _web  # type: ignore[attr-defined]
 
 
 # ══════════════════════════════════════════════════════════════

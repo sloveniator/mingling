@@ -48,7 +48,7 @@ def _set_tz(value: str | None) -> None:
     else:
         os.environ["TZ"] = value
     if _TZSET_AVAILABLE:
-        time.tzset()
+        time.tzset()  # type: ignore[attr-defined]
 
 
 # ── 契约 ───────────────────────────────────────────────────────────────

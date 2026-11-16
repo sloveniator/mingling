@@ -62,12 +62,13 @@ mypy_path = "."
 explicit_package_bases = true
 namespace_packages = true
 
-# 【mypy 基线现状（2026-11-16）】配置修复后 mypy 已能完整运行（187 源文件），
-# 暴露 200 个**既有**类型问题，非本轮引入。构成：attr-defined 150（主体，star_mixins
-# 等动态 Mixin 裸类靠 getattr/try-except 防御式访问 self.persona/proactive 等宿主注入
-# 属性，运行时由 main.py MingbuPlugin 的 MRO 提供，mypy 静态不可见——属动态 Mixin
-# 模式固有盲区，非真 bug，彻底修复需引入 Protocol/显式标注）；assignment 21、
-# arg-type 7、var-annotated 8 等。排除 devtools(测试桩)/tests 后业务代码 160 个。
-# 当前 mypy 不在 CI 门禁（ci.yml 仅 ruff+pytest）。**接入门禁需先治理上述技术债**，
-# 建议渐进式：先修 assignment/arg-type 等 ~40 个候选真问题，attr-defined 用
-# Protocol/基类标注收口，再行纳入 CI。本阶段仅完成「mypy 可运行 + 基线量化」，未清债。
+# 【mypy 基线现状（2026-11-16）】配置修复后 mypy 已能完整运行（187 源文件）。
+# 经治理（Mixin 宿主属性 Protocol 收口 + 业务真类型问题修复）：
+# - 业务代码（star_mixins/ + stars/）attr-defined 已**清零**——引入
+#   star_mixins/_host.py MixinHost 纯类型声明基类，各 Mixin 继承以声明
+#   self.persona/memory/get_kv_data 等宿主属性，不改运行行为。
+# - 剩余 36 项全在 devtools/（测试桩动态模块属性 28）+ tests/（harness 方法 4
+#   + AST 节点 3 + bench 1）——均为静态分析固有盲区，非真 bug，不阻塞 CI。
+# 构成：attr-defined 35、valid-type 1、assignment 1（收口前的分桶记录）。
+# **CI 门禁**：技术债已全部清零（188 源文件 0 错误），mypy 在 ci.yml 中已改为
+# **阻塞门禁**（mypy 失败即 CI 失败）。新增代码若引入类型错误会直接阻塞合并。

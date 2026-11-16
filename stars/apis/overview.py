@@ -14,6 +14,7 @@ from ...constants import PLUGIN_NAME
 from ...metrics import get_failure_counts
 from ._base import (
     MAX_LIST_USERS,
+    ApiHost,
     api_endpoint,
     error_response,
     gather_limited,
@@ -25,7 +26,7 @@ from ._base import (
 )
 
 
-class OverviewApiMixin:
+class OverviewApiMixin(ApiHost):
     """概览域 Web API。"""
 
     # ── /stats ────────────────────────────────────────────────

@@ -56,7 +56,7 @@ SAMPLE = "今天面试完了，说实话有点焦虑，我一直很想去这家�
 
 async def bench_conversation(n_msgs: int):
     plugin = CountingPlugin()
-    plugin.memory = MemoryCore(plugin)
+    plugin.memory = MemoryCore(plugin)  # type: ignore[attr-defined]
     insp = ConversationInspector(plugin)
     t0 = time.perf_counter()
     for i in range(n_msgs):

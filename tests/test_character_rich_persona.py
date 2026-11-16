@@ -29,6 +29,13 @@ from main import MingbuPlugin
 
 class _Harness:
     """带内存 KV 的 FakePlugin，同时充当 switch 解析方法的 self。"""
+    # 以下方法在 _build_harness() 中由 MingbuPlugin 的实现 __get__ 绑定到实例，
+    # 仅作类型声明供 mypy 识别（运行时由 __get__ 注入，非本类定义）。
+    _list_unlocked_cards: object
+    _find_unlocked_character: object
+    _do_switch_character: object
+    _character_codex_lines: object
+
     def __init__(self):
         self.kv = {}
         self.character_pool = None

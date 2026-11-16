@@ -12,9 +12,10 @@ from astrbot.api import logger
 from astrbot.api.event import AstrMessageEvent
 
 from ..bj_time import now_bj
+from ._host import MixinHost
 
 
-class GroupChatMixin:
+class GroupChatMixin(MixinHost):
     """群聊与好友场景辅助：@ 检测、首次私聊 onboarding。"""
 
     def _bot_mentioned(self, event: AstrMessageEvent) -> bool:

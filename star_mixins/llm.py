@@ -13,9 +13,10 @@ from astrbot.api import logger
 from astrbot.api.provider import ProviderRequest
 
 from ..constants import LLM_TEXT_TIMEOUT
+from ._host import MixinHost
 
 
-class LLMTextMixin:
+class LLMTextMixin(MixinHost):
     """系统级 LLM 文本生成（带防递归 + 超时兜底 + Token 监控）。"""
 
     async def _llm_text(self, prompt: str, session_id: str = "mingbu_sys", task_type: str = "general") -> str:

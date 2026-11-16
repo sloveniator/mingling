@@ -29,9 +29,10 @@ from ..provider_router import (
     rerank_memory_list,
 )
 from ..worldview_adapter import adapt_system_prompt, auto_style_for_character
+from ._host import MixinHost
 
 
-class PersonaContextMixin:
+class PersonaContextMixin(MixinHost):
     """人格块拼装与记忆召回（语义向量召回 / rerank 重排，均优雅降级）。"""
 
     async def _current_character(self, uid: str):

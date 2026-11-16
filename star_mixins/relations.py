@@ -18,6 +18,7 @@ from astrbot.api import logger
 from ..bond import Bond
 from ..constants import KV_USERS
 from ..persona import Relationship
+from ._host import MixinHost
 
 # 活跃用户索引的内存缓存 TTL：超过该时长则重新从 KV 拉取一次，
 # 以消解不同 Star 实例各自维护一份 _known_uids 导致的跨实例滞后
@@ -25,13 +26,18 @@ from ..persona import Relationship
 _KNOWN_UIDS_TTL = 60
 
 
-class RelationshipMixin:
+class RelationshipMixin(MixinHost):
     """用户关系读写与活跃用户索引维护。"""
 
     # 运行时由宿主 MingbuPlugin（MRO）或方法内 hasattr/None 检查惰性初始化的
     # 动态属性；这里仅作类型声明（字符串注解，不产生运行时绑定），供 mypy 静态识别。
+    # 关系/羁绊缓存与活跃用户索引都由 MingbuCore.__init__（经 __getattr__ 代理）持有，
+    # 故继承 MixinHost 以复用 _config / get_kv_data / put_kv_data 等宿主声明。
     _bond_cache: "Dict[str, Bond]"
     _known_uids: "Optional[Set[str]]"
+    _rel_cache: "Dict[str, Relationship]"
+    _max_rel_cache: int
+    _known_uids_ts: float
 
     async def _get_relationship(self, uid: str) -> Relationship:
         if uid in self._rel_cache:

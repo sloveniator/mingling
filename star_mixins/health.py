@@ -12,9 +12,10 @@ import json
 from astrbot.api import logger
 
 from ..health import HealthProfile
+from ._host import MixinHost
 
 
-class HealthProfileMixin:
+class HealthProfileMixin(MixinHost):
     """健康档案存取。"""
 
     async def _get_health_profile(self, uid: str) -> HealthProfile:

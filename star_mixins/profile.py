@@ -19,6 +19,7 @@ from ..bj_time import now_bj
 from ..constants import BUGUA_METHODS, KV_PROFILE, MINGPAN_METHODS
 from ..formatters import _clock_to_shichen
 from ..util import spawn
+from ._host import MixinHost
 
 
 def _normalize_birth_hour(hour: Any) -> Any:
@@ -63,7 +64,7 @@ def _apply_late_zi_swap(year, month, day, birth_hour):
     return year, month, day, birth_hour, False
 
 
-class ProfileMixin:
+class ProfileMixin(MixinHost):
     """用户档案与出生信息：读写、参数归一、方法推断、合法性校验。"""
 
     async def _get_profile(self, uid: str) -> dict:

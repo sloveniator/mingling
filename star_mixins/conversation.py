@@ -14,9 +14,10 @@ from astrbot.api import logger
 
 from ..bj_time import now_bj
 from ..constants import KV_CONTEXT
+from ._host import MixinHost
 
 
-class ConversationContextMixin:
+class ConversationContextMixin(MixinHost):
     """聊天上下文管理：结构化轮次记录 + 话题追踪。"""
 
     TURN_HISTORY = 10  # 保留的近期轮次上限（支持多轮对话连贯）

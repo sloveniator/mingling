@@ -21,7 +21,14 @@ from ...provider_router import (
     _provider_id_candidates,
     _resolve,
 )
-from ._base import api_endpoint, error_response, json_response, request_json, request_method
+from ._base import (
+    ApiHost,
+    api_endpoint,
+    error_response,
+    json_response,
+    request_json,
+    request_method,
+)
 
 
 def _mask_secret(value: str) -> str:
@@ -65,7 +72,7 @@ def _result(service: str, started: float, *, ok: bool, error: str = "", **extra)
     return data
 
 
-class DiagnosticsApiMixin:
+class DiagnosticsApiMixin(ApiHost):
     """管理面板的依赖状态和最小连通性检查。
 
     认证由 AstrBot Plugin Pages 宿主负责；本插件不伪造一套可能与宿主冲突的

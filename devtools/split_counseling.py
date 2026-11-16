@@ -184,9 +184,9 @@ os.makedirs(OUT_DIR, exist_ok=True)
 
 for module, nodes in nodes_by_module.items():
     assert nodes, f"module {module} has no nodes"
-    nodes_sorted = sorted(nodes, key=lambda n: n.lineno)
-    start = nodes_sorted[0].lineno
-    end = max(n.end_lineno for n in nodes_sorted)
+    nodes_sorted = sorted(nodes, key=lambda n: n.lineno)  # type: ignore[attr-defined]
+    start = nodes_sorted[0].lineno  # type: ignore[attr-defined]
+    end = max(n.end_lineno for n in nodes_sorted)  # type: ignore[attr-defined]
     block = "".join(lines[start - 1 : end])
     content = HEADERS[module].rstrip("\n") + "\n\n" + block
     if not content.endswith("\n"):

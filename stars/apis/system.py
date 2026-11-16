@@ -14,6 +14,7 @@ from astrbot.api import logger
 
 from ...bj_time import now_bj
 from ._base import (
+    ApiHost,
     api_endpoint,
     error_response,
     json_response,
@@ -54,7 +55,7 @@ _HOT_RELOAD_MAP = {
 }
 
 
-class SystemApiMixin:
+class SystemApiMixin(ApiHost):
     """系统域 Web API。"""
 
     # ── /kv ───────────────────────────────────────────────────

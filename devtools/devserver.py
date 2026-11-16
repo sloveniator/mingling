@@ -302,7 +302,7 @@ class AsyncRuntime:
         self.loop.call_soon_threadsafe(self.loop.stop)
 
 
-async def _invoke(handler, req: StubRequest):
+async def _invoke(handler, req: "StubRequest"):  # type: ignore[valid-type]
     """在协程上下文里绑定当前请求后调用 handler。
 
     用 ContextVar 而非全局变量：run_coroutine_threadsafe 会为每个协程
@@ -369,7 +369,7 @@ BRIDGE_JS = """/* devserver 注入：等价于 AstrBot 宿主的 window.AstrBotP
 
 class Handler(BaseHTTPRequestHandler):
     server_version = "MingbuDevServer/1.0"
-    runtime: AsyncRuntime = None      # 由 main 注入
+    runtime: "AsyncRuntime | None" = None      # 由 main 注入
     routes: Dict[str, Any] = {}
     plugin_name: str = "astrbot_plugin_mingbu"
     access_log: list = []
@@ -447,6 +447,8 @@ class Handler(BaseHTTPRequestHandler):
 
         req = StubRequest(method=method, query=query, body=body)
         try:
+            if self.runtime is None:
+                raise RuntimeError("AsyncRuntime 尚未由 main 注入")
             result = self.runtime.run(_invoke(spec["handler"], req))
         except Exception as e:
             traceback.print_exc()

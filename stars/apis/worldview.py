@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 
 from ._base import (
+    ApiHost,
     api_endpoint,
     error_response,
     json_response,
@@ -27,7 +28,7 @@ REQUIRED_WORLDVIEW_FIELDS = (
 )
 
 
-class WorldviewApiMixin:
+class WorldviewApiMixin(ApiHost):
     """世界观域 Web API。"""
 
     # ── /worldview/presets ────────────────────────────────────

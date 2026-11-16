@@ -38,6 +38,7 @@ from typing import Any, Callable, Optional
 from astrbot.api import logger
 
 from ...metrics import record_failure
+from ...star_mixins._host import MixinHost
 
 # 列表类接口一次最多展开的用户数。活跃用户索引可能有上万条，
 # 逐个拉关系/档案会把管理面板拖垮，这里统一设一个上限。
@@ -300,3 +301,15 @@ __all__ = [
 # 兼容旧名：拆分前 admin.py 内部叫 _gather_limited，
 # tests / devtools 若按旧名引用仍可用。
 _gather_limited = gather_limited
+
+
+class ApiHost(MixinHost):
+    """管理面板各领域 API Mixin 的宿主属性类型声明基类。
+
+    继承 :class:`star_mixins._host.MixinHost`（已声明 engine 属性 + KV 方法），
+    领域 Mixin 只需再补充本领域访问到的额外宿主属性。仅类型层，无运行时行为，
+    不会插进 ``StarAdmin`` 的构造链。
+    """
+
+    diviner: Any            # 占卜引擎（宿主 Star MRO 提供）
+
