@@ -28,3 +28,14 @@ outputs/
 .box-agent-scratch/
 prototype/
 pages/admin/dropdown-preview.html
+
+# v5 压力测试临时产物（非源码，切勿提交）
+.stress_data/
+.stress_test.py
+.stress_test2.py
+
+# v4 入口备份（本地回滚用，非源码）
+main_v4_backup.py.bak
+
+# Git Credential Manager 系统哨兵文件（非项目内容）
+system-commandline-sentinel-files/

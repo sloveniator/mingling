@@ -27,8 +27,8 @@ select = ["E", "F", "W", "I"]
 ignore = ["E501"]  # 长中文行交由 line-length 容忍；不强行拆行影响可读性
 
 [tool.ruff.lint.per-file-ignores]
-# 测试与桩文件放宽
-"tests/*" = ["F401", "F811"]
+# 测试与桩文件放宽；E402 因 v5 测试需先装 astrbot stub 再 import 业务模块
+"tests/*" = ["F401", "F811", "E402"]
 # 部署诊断脚本：故意用「未使用的导入」做依赖可用性探测，且 import 不在文件顶部
 "verify_hooks.py" = ["E402", "F401", "F811"]
 # 插件入口：必须先向 sys.path 注入插件目录再 import 本地模块，import 不在文件顶部属预期
