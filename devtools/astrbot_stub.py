@@ -104,8 +104,11 @@ class StubResponse:
         return f"StubResponse({self.status_code}, {self.payload!r})"
 
 
-def _json_response(payload: Any = None, **_kw) -> StubResponse:
-    return StubResponse(payload if payload is not None else {}, 200)
+def _json_response(payload: Any = None, **kw) -> StubResponse:
+    return StubResponse(
+        payload if payload is not None else {},
+        int(kw.get("status_code", 200)),
+    )
 
 
 def _error_response(message: str = "", status_code: int = 400, **_kw) -> StubResponse:

@@ -16,7 +16,7 @@
 > **技法先于角色，工程优于人设**：本插件是**拟人陪伴系统方法论的开源参考实现**——它是聊天机器人有温度、有记忆、会成长的「灵魂」，而不是一个算命工具。插件把记忆生命周期管理、人格连续性建模、关系网络识别、主动行为编排、对话权重评估、世界观转译等 12 项经过验证的工程技法，组合为一套可扩展的有「生命感」的聊天伙伴框架；命理（八字/紫微/六爻等）只作为后台静默洞察通道，把结论伪装成「直觉」织入对话，默认绝不主动以「算命」面貌出场。
 
 [![AstrBot](https://img.shields.io/badge/AstrBot-4.26%2B-purple)](https://github.com/Soulter/AstrBot)
-[![version](https://img.shields.io/badge/version-5.4.0-gold)](#版本演进)
+[![version](https://img.shields.io/badge/version-5.4.1-gold)](#版本演进)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ---
@@ -416,6 +416,8 @@ services:
 ## 版本演进
 
 > 按版本号倒序排列（最新在前），每个版本标注核心技法突破。
+
+**v5.4.1** · **管理面板 API 兼容 AstrBot 4.29**——① AstrBot 4.29 的 `register_web_api` 不向 handler 传 request，改用全局 `astrbot.api.web.request` 代理，原 `(self, request)` 签名导致三个接口全 500；已改为可选参数并自动解析全局代理；② 响应改用官方 `astrbot.api.web.json_response`，状态码正确透传；③ 测试桩同步支持 `status_code`。版本四件套 **5.4.0 → 5.4.1**。
 
 **v5.4.0** · **管理面板重做为 v5 专用控制台**——① 后端新增 `/mingling/overview` 与 `/mingling/config`（GET/POST），原有 `/users`、`/timeline` 增强为用户摘要与按类型/条数过滤；② 配置保存支持 AstrBot `save_config()`，缺失时回落到 `data/config/mingling_config.json`，并在内存中原地更新 `CompanionConfig`，状态层/主动消息/语义路由即时生效；③ 前端移除角色、TTS、暗盘、Token、诊断等 v4 遗留页签，改为「总览 / 用户与时间线 / 配置」三页；④ 总览展示版本、用户数、时间线文件、cron、活动配置摘要；用户页支持搜索、关系阶段/情绪/话题摘要与时间线展开；配置页覆盖全部 v5 活动键；⑤ 新增面板 API 与 schema 一致性测试。版本四件套 **5.3.2 → 5.4.0**。
 

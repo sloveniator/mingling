@@ -73,9 +73,19 @@ def _api():
 
 
 def _payload(res):
+    if hasattr(res, "payload"):
+        return res.payload
     if isinstance(res, tuple):
         return res[0]
     return res
+
+
+def _status(res):
+    if hasattr(res, "status_code"):
+        return res.status_code
+    if isinstance(res, tuple):
+        return res[1]
+    return 200
 
 
 def test_overview_returns_v5_stats_and_cron():
@@ -117,8 +127,8 @@ def test_config_post_rejects_unknown_key():
     api, _ = _api()
     req = StubRequest(method="POST", body={"evil_key": 1})
     res = asyncio.run(api._config_handler(req))
-    assert isinstance(res, tuple) and res[1] == 400
-    assert "不支持的配置键" in res[0]["error"]
+    assert _status(res) == 400
+    assert "不支持的配置键" in _payload(res)["error"]
 
 
 def test_users_summary_and_timeline_filter():

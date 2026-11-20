@@ -16,13 +16,18 @@ from store import Store
 
 
 def _json(data, status: int = 200):
-    """统一响应；兼容 quart Response 与测试桩 tuple。"""
-    resp = jsonify(data)
-    if status == 200:
-        return resp
-    if isinstance(resp, tuple):
-        return resp[0], status
-    return resp, status
+    """统一响应：优先 AstrBot 官方 json_response，测试环境回落到 tuple。"""
+    try:
+        from astrbot.api.web import json_response
+
+        return json_response(data, status_code=status)
+    except Exception:
+        resp = jsonify(data)
+        if status == 200:
+            return resp
+        if isinstance(resp, tuple):
+            return resp[0], status
+        return resp, status
 
 
 # 面板可编辑的活动配置键（relation_memory_half_life_days 为嵌套 dict，暂不做表单）
@@ -57,6 +62,15 @@ class AdminTimelineAPI:
                 pass
 
     # ---------- 工具 ----------
+    @staticmethod
+    def _resolve_request(request=None):
+        """AstrBot 4.29 不传 request，使用 astrbot.api.web.request 代理。"""
+        if request is not None:
+            return request
+        from astrbot.api.web import request as web_request
+
+        return web_request
+
     def _active_config(self) -> dict:
         data = {k: getattr(self._cfg, k) for k in CONFIG_KEYS}
         raw = getattr(self._plugin, "_raw_config", {}) or {}
@@ -119,7 +133,8 @@ class AdminTimelineAPI:
             return False, f"配置持久化失败: {e}"
 
     # ---------- handlers ----------
-    async def _overview_handler(self, request):
+    async def _overview_handler(self, request=None):
+        request = self._resolve_request(request)
         try:
             umos = await self._store.list_known_umos()
             stats = self._store.timeline_stats()
@@ -155,7 +170,8 @@ class AdminTimelineAPI:
         except Exception as e:  # noqa: BLE001
             return _json({"ok": False, "error": str(e)[:300]}, 500)
 
-    async def _config_handler(self, request):
+    async def _config_handler(self, request=None):
+        request = self._resolve_request(request)
         if getattr(request, "method", "GET").upper() == "GET":
             return _json({"ok": True, "config": self._active_config(),
                             "editable": sorted(ALLOWED_KEYS)})
@@ -186,7 +202,8 @@ class AdminTimelineAPI:
         except Exception as e:  # noqa: BLE001
             return _json({"ok": False, "error": str(e)[:300]}, 500)
 
-    async def _users_handler(self, request):
+    async def _users_handler(self, request=None):
+        request = self._resolve_request(request)
         try:
             umos = await self._store.list_known_umos()
             items = []
@@ -211,7 +228,8 @@ class AdminTimelineAPI:
         except Exception as e:  # noqa: BLE001
             return _json({"ok": False, "error": str(e)[:300]}, 500)
 
-    async def _timeline_handler(self, request):
+    async def _timeline_handler(self, request=None):
+        request = self._resolve_request(request)
         args = self._args(request)
         umo = args.get("umo")
         if not umo:
