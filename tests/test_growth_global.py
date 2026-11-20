@@ -203,3 +203,33 @@ def test_observe_message_writes_growth_signal_end_to_end():
     text = asyncio.run(p._build_global_growth_note())
     assert text == "整体反思"
     assert p._store.kv["mingling.growth.global"]["stats"]["before_count"] == 1
+
+
+def test_global_falls_back_to_relation_memory_when_no_signals():
+    class Store(FakeStore):
+        async def load(self, umo, suffix, default):
+            if suffix == "relation_memory":
+                return [{
+                    "topic": "面试",
+                    "content": "面试失败后决定复盘并调整计划",
+                    "strength": 1.0,
+                    "anchor": True,
+                    "last_access": 100.0,
+                    "created_at": 100.0,
+                }]
+            return await super().load(umo, suffix, default)
+
+    p = _plugin({"u1": []})
+    p._store = Store({"u1": []})
+    p._store.kv = p._store.kv if hasattr(p._store, "kv") else {}
+
+    async def ask(prompt, **kwargs):
+        return "降级后的整体反思"
+
+    p._ask = ask
+    text = asyncio.run(p._build_global_growth_note())
+    assert text == "降级后的整体反思"
+    stats = p._store.kv["mingling.growth.global"]["stats"]
+    assert stats["users_fallback"] == 1
+    assert stats["fallback_items"] == 1
+    assert stats["before_count"] == 1
