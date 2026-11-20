@@ -93,6 +93,20 @@ class Store:
             import traceback
             logger.error(f"[mingling] append_timeline failed: {umo}\n{traceback.format_exc()}")
 
+    def timeline_stats(self) -> dict:
+        """管理面板用：时间线文件数、总字节、最近更新时间。"""
+        try:
+            files = list(self._timeline_dir.glob("*.jsonl"))
+            sizes = [f.stat().st_size for f in files]
+            mtimes = [f.stat().st_mtime for f in files]
+            return {
+                "files": len(files),
+                "bytes": sum(sizes),
+                "last_modified": max(mtimes) if mtimes else 0.0,
+            }
+        except Exception:
+            return {"files": 0, "bytes": 0, "last_modified": 0.0}
+
     async def read_timeline(self, umo: str, limit: int = 500) -> list[dict]:
         path = self._timeline_path(umo)
         if not path.exists():

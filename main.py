@@ -56,6 +56,8 @@ class MinglingPlugin(Star):
 
     def __init__(self, context: Context, config: dict | None = None):
         super().__init__(context)
+        # 显式持有 AstrBot 配置对象：管理面板保存时调用其 save_config()。
+        self.config = config if config is not None else {}
         self._raw_config = dict(config or {})
         self._cfg = CompanionConfig.from_raw(config or {})
         self._store = Store(self)
@@ -73,7 +75,7 @@ class MinglingPlugin(Star):
             self._emotion, self._relationship,
             self._loops, self._topics, self._memory,
         )
-        self._admin = AdminTimelineAPI(self._store, self._cfg)
+        self._admin = AdminTimelineAPI(self._store, self._cfg, self)
         self._client = None
 
         # 同一消息可能触发多次 on_llm_request，用 (umo, text[:50], 分钟) 去重
