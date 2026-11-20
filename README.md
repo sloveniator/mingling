@@ -16,7 +16,7 @@
 > **技法先于角色，工程优于人设**：本插件是**拟人陪伴系统方法论的开源参考实现**——它是聊天机器人有温度、有记忆、会成长的「灵魂」，而不是一个算命工具。插件把记忆生命周期管理、人格连续性建模、关系网络识别、主动行为编排、对话权重评估、世界观转译等 12 项经过验证的工程技法，组合为一套可扩展的有「生命感」的聊天伙伴框架；命理（八字/紫微/六爻等）只作为后台静默洞察通道，把结论伪装成「直觉」织入对话，默认绝不主动以「算命」面貌出场。
 
 [![AstrBot](https://img.shields.io/badge/AstrBot-4.26%2B-purple)](https://github.com/Soulter/AstrBot)
-[![version](https://img.shields.io/badge/version-5.3.0-gold)](#版本演进)
+[![version](https://img.shields.io/badge/version-5.3.1-gold)](#版本演进)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ---
@@ -416,6 +416,8 @@ services:
 ## 版本演进
 
 > 按版本号倒序排列（最新在前），每个版本标注核心技法突破。
+
+**v5.3.1** · **cron 注册兼容 AstrBot 4.29**——生产验收发现 `CronJobManager.add_basic_job` 已改为异步且参数名为 `cron_expression`，旧写法 `cron=` 导致主动消息与每周成长任务注册失败。修复为按签名自适应：支持 `cron_expression`/`cron`、同步/异步返回值，并显式绑定 `Asia/Shanghai` 时区；新增同步/异步两种管理器签名的回归测试。版本四件套 **5.3.0 → 5.3.1**。
 
 **v5.3.0** · **混合意图路由：正则快速路径 + 默认模型语义兜底**——① 新增 `semantic_router.py`：正则未命中且消息含功能/情绪线索时，调用 AstrBot 默认模型输出严格 JSON（intent/confidence/counsel_action）；② 正则已命中（排盘/卜卦/塔罗/健康/成长/状态/情绪/退出）时不调用模型，保持零成本零延迟；③ 开解中仅对可能收束/转向的长消息做语义判断，短应声直接延续；④ 低置信度、超时、JSON 非法一律 fail-open，交回普通聊天；⑤ 新增 `semantic_router_enabled/confidence/timeout/min_chars` 四个配置键；⑥ 新增解析、触发条件、语义进入开解、低置信度忽略、正则快路径不调用模型等测试。版本四件套 **5.2.0 → 5.3.0**。
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 import os
 import sys
 import time
@@ -83,7 +84,7 @@ class MinglingPlugin(Star):
         if not self._cfg.enabled:
             logger.info("[mingling] enabled=False，插件不注册任何钩子")
             return
-        self._register_cron()
+        await self._register_cron()
         self._admin.register(self.context)
         logger.info("[mingling] 1V1 状态层已启用")
 
@@ -96,7 +97,24 @@ class MinglingPlugin(Star):
             self._client = None
         logger.info("[mingling] terminated")
 
-    def _register_cron(self) -> None:
+    async def _add_cron_job(self, manager, *, name: str, expression: str,
+                            handler, description: str) -> None:
+        """兼容 AstrBot 不同版本的 cron 注册签名（cron/cron_expression，同步/异步）。"""
+        params = inspect.signature(manager.add_basic_job).parameters
+        kwargs = {"name": name, "handler": handler, "description": description}
+        if "cron_expression" in params:
+            kwargs["cron_expression"] = expression
+        elif "cron" in params:
+            kwargs["cron"] = expression
+        else:
+            raise TypeError("add_basic_job 缺少 cron/cron_expression 参数")
+        if "timezone" in params:
+            kwargs["timezone"] = "Asia/Shanghai"
+        result = manager.add_basic_job(**kwargs)
+        if inspect.isawaitable(result):
+            await result
+
+    async def _register_cron(self) -> None:
         try:
             manager = self.context.cron_manager
         except AttributeError:
@@ -114,18 +132,16 @@ class MinglingPlugin(Star):
                     logger.error(f"[mingling] proactive tick failed: {umo}\n{traceback.format_exc()}")
 
         try:
-            manager.add_basic_job(
+            await self._add_cron_job(
+                manager,
                 name="mingling_proactive_tick",
-                cron="0 * * * *",
+                expression="0 * * * *",
                 handler=_tick_all,
                 description="命灵主动消息检查",
             )
-        except TypeError:
-            try:
-                manager.add_basic_job("mingling_proactive_tick", "0 * * * *", _tick_all)
-            except Exception:
-                import traceback
-                logger.error(f"[mingling] 注册 cron 失败\n{traceback.format_exc()}")
+        except Exception:
+            import traceback
+            logger.error(f"[mingling] 注册 cron 失败\n{traceback.format_exc()}")
 
         async def _growth_all() -> None:
             if not self._cfg.growth_engine_enabled:
@@ -140,18 +156,16 @@ class MinglingPlugin(Star):
                     )
 
         try:
-            manager.add_basic_job(
+            await self._add_cron_job(
+                manager,
                 name="mingling_growth_weekly",
-                cron="0 3 * * 1",
+                expression="0 3 * * 1",
                 handler=_growth_all,
                 description="命灵每周成长反思",
             )
-        except TypeError:
-            try:
-                manager.add_basic_job("mingling_growth_weekly", "0 3 * * 1", _growth_all)
-            except Exception:
-                import traceback
-                logger.error(f"[mingling] 注册成长 cron 失败\n{traceback.format_exc()}")
+        except Exception:
+            import traceback
+            logger.error(f"[mingling] 注册成长 cron 失败\n{traceback.format_exc()}")
 
     # ---------- 核心：观察 + StateLayer 注入（唯一 LLM 钩子） ----------
     @filter.on_llm_request()

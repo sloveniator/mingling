@@ -26,6 +26,15 @@ NEW_PLUGIN = "mingling"
 # v5 CompanionConfig 实际读取的键及默认值。
 V5_DEFAULTS: dict[str, Any] = {
     "enabled": True,
+    "mingbu_api_url": "http://localhost:2963",
+    "semantic_router_enabled": True,
+    "semantic_router_confidence": 0.65,
+    "semantic_router_timeout": 8,
+    "semantic_router_min_chars": 4,
+    "counseling_enabled": True,
+    "tarot_enabled": True,
+    "health_enabled": True,
+    "growth_engine_enabled": True,
     "state_layer_enabled": True,
     "emotion_trace_enabled": True,
     "relationship_event_enabled": True,
