@@ -1,10 +1,10 @@
 """管理面板 /list_providers 与 /connectivity 诊断增强的回归测试。"""
 import asyncio
 
-import astrbot_plugin_mingbu.http_client as hc
+import mingling.http_client as hc
 import pytest
-from astrbot_plugin_mingbu.provider_router import _match_provider_by_name
 from conftest import StubRequest, reset_current_request, set_current_request
+from mingling.provider_router import _match_provider_by_name
 
 from tests.test_admin_api import FakeContext, build_star, call, payload_of
 

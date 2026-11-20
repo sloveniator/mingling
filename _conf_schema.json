@@ -1,4 +1,176 @@
 {
+  "enabled": {
+    "type": "bool",
+    "title": "启用命灵 v5",
+    "description": "总开关。关闭时插件不注册任何钩子；v5 本地构建默认开启。",
+    "default": true
+  },
+  "state_layer_enabled": {
+    "type": "bool",
+    "title": "注入状态层",
+    "description": "把关系/情绪/话题/未闭环摘要注入 system_prompt。",
+    "default": true
+  },
+  "emotion_trace_enabled": {
+    "type": "bool",
+    "title": "情绪轨迹",
+    "description": "记录用户情绪四维状态并参与状态层。",
+    "default": true
+  },
+  "relationship_event_enabled": {
+    "type": "bool",
+    "title": "关系事件",
+    "description": "记录关系阶段变化事件。",
+    "default": true
+  },
+  "topic_stack_enabled": {
+    "type": "bool",
+    "title": "话题栈",
+    "description": "跟踪当前话题与话题切换/恢复。",
+    "default": true
+  },
+  "open_loop_enabled": {
+    "type": "bool",
+    "title": "未闭环话题",
+    "description": "记录未解决的话题并在后续对话中提醒。",
+    "default": true
+  },
+  "relation_memory_enabled": {
+    "type": "bool",
+    "title": "关系记忆",
+    "description": "抽取并召回与关系相关的长期记忆。",
+    "default": true
+  },
+  "proactive_enabled": {
+    "type": "bool",
+    "title": "主动消息",
+    "description": "按小时检查并主动发消息（受每日上限与免打扰时段约束）。",
+    "default": true
+  },
+  "divination_tools_enabled": {
+    "type": "bool",
+    "title": "命理工具可见性",
+    "description": "允许在私聊中向模型暴露命理相关工具。",
+    "default": true
+  },
+  "counseling_tools_enabled": {
+    "type": "bool",
+    "title": "开解工具可见性",
+    "description": "允许在私聊中向模型暴露心理开解相关工具。",
+    "default": true
+  },
+  "state_layer_max_tokens": {
+    "type": "int",
+    "title": "状态层 Token 预算",
+    "description": "状态层注入的最大 token 数。",
+    "default": 220,
+    "minimum": 60,
+    "maximum": 2000
+  },
+  "state_layer_max_anchors": {
+    "type": "int",
+    "title": "记忆锚点上限",
+    "description": "单次状态层最多注入的记忆条数。",
+    "default": 2,
+    "minimum": 0,
+    "maximum": 10
+  },
+  "proactive_max_per_day": {
+    "type": "int",
+    "title": "每日主动上限",
+    "description": "每个用户每天最多主动消息条数。",
+    "default": 2,
+    "minimum": 0,
+    "maximum": 20
+  },
+  "proactive_mood_window_hours": {
+    "type": "int",
+    "title": "情绪窗口（小时）",
+    "description": "多久内的情绪信号可用于主动关怀判断。",
+    "default": 48,
+    "minimum": 1,
+    "maximum": 168
+  },
+  "proactive_daily_greet_min_gap_hours": {
+    "type": "int",
+    "title": "日常问候最小间隔",
+    "description": "两次日常问候之间至少间隔的小时数。",
+    "default": 20,
+    "minimum": 1,
+    "maximum": 72
+  },
+  "proactive_quiet_start_hour": {
+    "type": "int",
+    "title": "免打扰开始小时",
+    "description": "24 小时制；开始大于结束表示跨午夜。",
+    "default": 0,
+    "minimum": 0,
+    "maximum": 23
+  },
+  "proactive_quiet_end_hour": {
+    "type": "int",
+    "title": "免打扰结束小时",
+    "description": "24 小时制。",
+    "default": 7,
+    "minimum": 0,
+    "maximum": 23
+  },
+  "proactive_max_unanswered_open_loop": {
+    "type": "int",
+    "title": "未闭环话题追问上限",
+    "description": "同一未闭环话题最多追问次数。",
+    "default": 2,
+    "minimum": 0,
+    "maximum": 10
+  },
+  "proactive_max_unanswered_daily": {
+    "type": "int",
+    "title": "日常问候未回复上限",
+    "description": "连续未回复时最多再发几次日常问候。",
+    "default": 1,
+    "minimum": 0,
+    "maximum": 10
+  },
+  "open_loop_window_days": {
+    "type": "int",
+    "title": "未闭环窗口（天）",
+    "description": "超过该天数自动关闭未闭环话题。",
+    "default": 7,
+    "minimum": 1,
+    "maximum": 90
+  },
+  "relation_memory_max_items": {
+    "type": "int",
+    "title": "关系记忆条数上限",
+    "description": "每个用户保留的关系记忆上限。",
+    "default": 120,
+    "minimum": 20,
+    "maximum": 1000
+  },
+  "emotion_anchor_threshold": {
+    "type": "float",
+    "title": "情绪锚点阈值",
+    "description": "情绪强度超过该值时提高记忆权重。",
+    "default": 0.7,
+    "minimum": 0,
+    "maximum": 1
+  },
+  "emotion_anchor_multiplier": {
+    "type": "float",
+    "title": "情绪锚点倍率",
+    "description": "情绪锚点记忆的权重倍率。",
+    "default": 3.0,
+    "minimum": 1,
+    "maximum": 10
+  },
+  "timeline_max_lines": {
+    "type": "int",
+    "title": "时间线读取上限",
+    "description": "管理 API 单次返回的最大时间线行数。",
+    "default": 500,
+    "minimum": 50,
+    "maximum": 5000
+  },
   "mingbu_api_url": {
     "type": "string",
     "title": "Mingbu 服务地址",
@@ -130,12 +302,6 @@
     "title": "启用主动搜索",
     "description": "Bot 会按人格兴趣主动搜索并留下探索笔记。",
     "default": false
-  },
-  "proactive_enabled": {
-    "type": "bool",
-    "title": "启用主动关怀",
-    "description": "是否允许灵犀根据关系和活跃度主动给用户发消息。",
-    "default": true
   },
   "quiet_hours_start": {
     "type": "int",
@@ -744,12 +910,5 @@
     "title": "合并转述模型名",
     "description": "留空则用默认模型。",
     "default": ""
-  },
-  "integration_mode": {
-    "type": "string",
-    "title": "增强集成模式",
-    "description": "命灵注入 AstrBot 请求的方式。observe=只记录不注入（零行为变化，用于调试/观察）；enhance=按需注入少量动态上下文（默认）；assist=增强模式并允许调用记忆/情绪/关系等工具（深度陪伴）。",
-    "default": "enhance",
-    "hint": "observe / enhance / assist"
   }
 }

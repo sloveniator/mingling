@@ -17,11 +17,11 @@ import asyncio
 from types import SimpleNamespace
 
 import pytest
-from astrbot_plugin_mingbu.provider_router import (
+from mingling.provider_router import (
     _normalize_provider_modalities,
     ensure_chat_provider_no_audio,
 )
-from astrbot_plugin_mingbu.util import strip_audio_parts_from_messages
+from mingling.util import strip_audio_parts_from_messages
 
 
 class FakeChatProvider:
@@ -150,7 +150,7 @@ class TestProviderRequestContract:
     def test_no_messages_attr(self):
         """AstrBot 4.27 ProviderRequest 没有 messages 属性——剥离必须剥 contexts。"""
         import astrbot.api.provider as _provider  # noqa: F401 - 触发桩
-        from astrbot_plugin_mingbu.devtools.astrbot_stub import (
+        from mingling.devtools.astrbot_stub import (
             install_astrbot_stub,
         )
 

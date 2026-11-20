@@ -25,7 +25,7 @@ import types
 from typing import Any, Dict, Optional
 
 PLUGIN_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PKG_NAME = "astrbot_plugin_mingbu"
+PKG_NAME = "mingling"
 STARS_DIR = os.path.join(PLUGIN_DIR, "stars")
 
 
@@ -593,7 +593,7 @@ def _alias_spec(short_name, mod):
 
 
 class _PluginRemapFinder(importlib.abc.MetaPathFinder):
-    """将短名导入（import dream）重映射为包内导入（astrbot_plugin_mingbu.dream）。
+    """将短名导入（import dream）重映射为包内导入（mingling.dream）。
 
     好处：测试可以继续写 `import dream`，而源码里的相对导入
     `from .astrology import ...` 同样能解析，且两者指向同一个模块对象。

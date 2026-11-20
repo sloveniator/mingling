@@ -30,8 +30,9 @@ def _as_float(v: Any, default: float) -> float:
 
 @dataclass
 class CompanionConfig:
-    # 总开关：False 时插件在 initialize() 立即返回
-    enabled: bool = False
+    # 总开关：False 时插件在 initialize() 立即返回。
+    # v5 本地构建默认开启：升级后不应因缺少 enabled 键而静默失效。
+    enabled: bool = True
 
     # 子开关（仅 enabled=True 时生效）
     state_layer_enabled: bool = True
@@ -87,6 +88,13 @@ class CompanionConfig:
             raw = inner
 
         cfg.enabled = _as_bool(raw.get("enabled"), cfg.enabled)
+
+        # v4 → v5 配置兼容：旧版没有 enabled / proactive_quiet_* 键，
+        # 这里按旧版语义补默认值，避免升级后主动消息落在错误时段。
+        if "proactive_quiet_start_hour" not in raw and "quiet_hours_start" in raw:
+            raw["proactive_quiet_start_hour"] = raw.get("quiet_hours_start")
+        if "proactive_quiet_end_hour" not in raw and "quiet_hours_end" in raw:
+            raw["proactive_quiet_end_hour"] = raw.get("quiet_hours_end")
 
         bool_fields = (
             "state_layer_enabled", "emotion_trace_enabled", "relationship_event_enabled",

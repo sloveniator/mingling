@@ -1,6 +1,15 @@
 from __future__ import annotations
 
+import os
+import sys
 import time
+
+# AstrBot 以包形式加载本文件（data.plugins.mingling.main），而下列业务模块
+# 使用短名导入。把插件目录加入 sys.path，保证包加载与 devtools 直接加载
+# 两种方式都能解析到同一份模块。
+_PLUGIN_DIR = os.path.dirname(os.path.abspath(__file__))
+if _PLUGIN_DIR not in sys.path:
+    sys.path.insert(0, _PLUGIN_DIR)
 
 from astrbot.api import logger
 from astrbot.api.event import AstrMessageEvent, filter
@@ -50,7 +59,7 @@ class MinglingPlugin(Star):
     # ---------- 生命周期 ----------
     async def initialize(self) -> None:
         if not self._cfg.enabled:
-            logger.info("[mingling] private_companion_mode 关闭，插件不注册任何钩子")
+            logger.info("[mingling] enabled=False，插件不注册任何钩子")
             return
         self._register_cron()
         self._admin.register(self.context)

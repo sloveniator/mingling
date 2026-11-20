@@ -15,7 +15,7 @@ v4.8.141：运行时 TTS 合成完全交由 AstrBot provider，插件不再直�
 
 def test_voice_list_is_official_24():
     """音色列表必须是官方 24 音色：无虚构名、含新音色、数量钉死。"""
-    from astrbot_plugin_mingbu.stars.apis.tts_voices import (
+    from mingling.stars.apis.tts_voices import (
         _DASHSCOPE_TTS_VOICES,
         _DASHSCOPE_VOICE_NAMES,
     )
@@ -33,7 +33,7 @@ def test_voice_list_is_official_24():
 
 def test_invalid_voice_falls_back_to_cherry():
     """配置残留虚构音色（Olivia）→ 必须回退 Cherry，不能静默 400。"""
-    from astrbot_plugin_mingbu.tts_config import resolve_dashscope_voice
+    from mingling.tts_config import resolve_dashscope_voice
 
     assert resolve_dashscope_voice("Olivia") == "Cherry"
     assert resolve_dashscope_voice("Liam") == "Cherry"
@@ -43,7 +43,7 @@ def test_invalid_voice_falls_back_to_cherry():
 
 def test_valid_voice_passthrough_untouched():
     """官方真实音色（Moon）必须原样透传，白名单不得误伤。"""
-    from astrbot_plugin_mingbu.tts_config import resolve_dashscope_voice
+    from mingling.tts_config import resolve_dashscope_voice
 
     assert resolve_dashscope_voice("Moon") == "Moon"
     assert resolve_dashscope_voice("Cherry") == "Cherry"

@@ -1,15 +1,15 @@
 """
-astrbot_plugin_mingbu 钩子验证脚本
+mingling 钩子验证脚本
 ==================================
-将本文件放到 AstrBot 的 data/plugins/astrbot_plugin_mingbu/ 目录下，
+将本文件放到 AstrBot 的 data/plugins/mingling/ 目录下，
 在 AstrBot Python 环境中运行以验证钩子注入是否正常工作。
 
 用法（在 AstrBot 容器内）：
-    cd /AstrBot/data/plugins/astrbot_plugin_mingbu
+    cd /AstrBot/data/plugins/mingling
     python verify_hooks.py
 
 或在宿主机：
-    docker exec astrbot python /AstrBot/data/plugins/astrbot_plugin_mingbu/verify_hooks.py
+    docker exec astrbot python /AstrBot/data/plugins/mingling/verify_hooks.py
 """
 
 import importlib
@@ -72,21 +72,21 @@ except ImportError:
 section("2. 插件主模块结构检查")
 
 try:
-    from main import MingbuPlugin
-    ok("MingbuPlugin 类存在")
+    from main import MinglingPlugin
+    ok("MinglingPlugin 类存在")
 except ImportError as e:
-    fail(f"无法导入 MingbuPlugin: {e}")
+    fail(f"无法导入 MinglingPlugin: {e}")
     sys.exit(1)
 
-from main import MingbuPlugin
+from main import MinglingPlugin
 
 # 检查 on_llm_request 钩子
 found_hook = False
-for name in dir(MingbuPlugin):
-    if name.startswith('_on_llm') or name == '_on_llm_request':
+for name in dir(MinglingPlugin):
+    if name == 'inject_state_layer' or name.startswith('_on_llm') or name == '_on_llm_request':
         found_hook = True
         ok(f"发现 on_llm_request 钩子: {name}")
-        method = getattr(MingbuPlugin, name)
+        method = getattr(MinglingPlugin, name)
         # 检查签名
         import inspect
         sig = inspect.signature(method)
@@ -103,7 +103,7 @@ if not found_hook:
 
 # 检查是否还存在 on_decorating_result 钩子（应该已被删除）
 found_old = False
-for name in dir(MingbuPlugin):
+for name in dir(MinglingPlugin):
     if 'prophetic' in name.lower() or 'decorating' in name.lower():
         found_old = True
         fail(f"发现已废弃的钩子: {name}（应已删除）")
@@ -161,7 +161,7 @@ section("5. 装饰器语法检查")
 import inspect
 import textwrap
 
-source = inspect.getsource(MingbuPlugin._on_llm_request)
+source = inspect.getsource(MinglingPlugin._on_llm_request)
 if '@filter.on_llm_request()' in source:
     ok("装饰器语法: @filter.on_llm_request() （正确）")
 elif '@filter.on_llm_request' in source:

@@ -1,10 +1,44 @@
-# 命灵 · AI 伴侣 — AstrBot 拟人陪伴插件
+# 命灵 · AI 伴侣 — AstrBot 1V1 状态层插件（v5）
+
+> **v5.0.0 破坏性重构（已按上游 `sloveniator/mingling` HEAD 落地）**
+> 本版本砍掉角色收集、群聊观察、TTS/STT、命理指令、暗盘、成长/梦境等 v4 功能，
+> 只保留 **1V1 私聊状态层**：关系阶段、情绪轨迹、话题栈、未闭环话题、关系记忆、
+> 主动消息、状态层注入与 `/命灵状态` 调试命令。
+> 插件标识与目录已统一为 `mingling`；升级前请先运行 `migrate_v4_to_v5.py` 迁移配置
+> 与 `plugin_data`，并阅读下方「v5 功能范围与迁移」。
 
 > **技法先于角色，工程优于人设**：本插件是**拟人陪伴系统方法论的开源参考实现**——它是聊天机器人有温度、有记忆、会成长的「灵魂」，而不是一个算命工具。插件把记忆生命周期管理、人格连续性建模、关系网络识别、主动行为编排、对话权重评估、世界观转译等 12 项经过验证的工程技法，组合为一套可扩展的有「生命感」的聊天伙伴框架；命理（八字/紫微/六爻等）只作为后台静默洞察通道，把结论伪装成「直觉」织入对话，默认绝不主动以「算命」面貌出场。
 
 [![AstrBot](https://img.shields.io/badge/AstrBot-4.26%2B-purple)](https://github.com/Soulter/AstrBot)
-[![version](https://img.shields.io/badge/version-4.9.9-gold)](#版本演进)
+[![version](https://img.shields.io/badge/version-5.0.0-gold)](#版本演进)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+---
+
+## v5 功能范围与迁移
+
+**保留**：1V1 私聊状态层（关系阶段、情绪轨迹、话题栈、未闭环话题、关系记忆）、
+主动消息、`/命灵状态` 调试命令、管理 API（`/mingling/users`、`/mingling/timeline`）。
+
+**移除**：角色收集/切换、群聊观察、TTS/STT、排盘/卜卦/塔罗等命理指令、暗盘洞察、
+成长反思、梦境/预感、News/搜索、SocialGraph、TTS 音色库与旧管理面板业务。
+
+**配置**：v5 只读取 `CONFIG_V5.md` 列出的 24 个键；`_conf_schema.json` 仍保留旧键
+以兼容历史配置，但旧键不再参与运行。`enabled` 默认 `true`。
+
+**迁移步骤**：
+
+```bash
+# 1) 备份 AstrBot 数据目录（必须）
+# 2) dry-run 查看动作
+python migrate_v4_to_v5.py --data-dir ~/.astrbot
+# 3) 执行迁移
+python migrate_v4_to_v5.py --data-dir ~/.astrbot --apply
+# 4) 重启 AstrBot，确认插件目录名为 mingling
+```
+
+> 旧 KV 按插件名隔离，脚本不自动改写；需要保留历史关系/情绪/记忆时，见
+> `CONFIG_V5.md` 末尾的数据库迁移说明。
 
 ---
 
@@ -371,6 +405,8 @@ services:
 ## 版本演进
 
 > 按版本号倒序排列（最新在前），每个版本标注核心技法突破。
+
+**v5.0.0** · **1V1 状态层破坏性重构 + 插件身份统一为 mingling**——按上游 `sloveniator/mingling` HEAD（`a04767b`）落地 v5：① 入口收敛为单一 LLM 钩子 + `/命灵状态` 命令，状态层由关系、情绪、话题栈、未闭环话题、关系记忆五路组成，按 token 预算注入 `system_prompt`；② 新增 `Store`（KV + jsonl 时间线）、`ProactiveEngine`、`AdminTimelineAPI`（`/mingling/users`、`/mingling/timeline`）；③ 插件标识、包名、目录、配置文件名统一为 `mingling`，`plugin_data` 根目录改为 `plugin_data/mingling`；④ 配置 schema 补齐 v5 实际读取的 24 个键，`enabled` 默认 `true`，并把旧版 `quiet_hours_*` 映射到 `proactive_quiet_*`；⑤ 新增 `migrate_v4_to_v5.py`，迁移旧配置与时间线文件；⑥ 删除 v4 的角色/群聊/TTS/STT/命理指令/暗盘/成长/梦境等运行链路。版本四件套 **4.9.9 → 5.0.0**。
 
 **v4.9.9** · **Embedding/Rerank/图片转述 直连键描述纠正（运行时已完全走 Provider）**——接续 v4.9.7/4.9.8 的 Provider 化文档收尾，本次覆盖 Embedding / Rerank / 图片转述（Vision）三类。运行时早已完全交由 AstrBot Provider（`get_embedding_provider` / `get_rerank_provider` 走 AstrBot embedding/rerank provider 实例；图片转述 `_describe_images` 走 `provider_router.llm_request("image_vision")`），插件侧的 `embedding_api_key` / `rerank_api_key` / `image_vision_api_key` 直连键**运行时零读取**，仅剩管理面板「连通性测试」按钮作为自填凭据消费——但 schema 描述仍写「填此项后优先使用插件配置直接调用，不依赖 AstrBot」「优先走插件直连（覆盖 provider_image_vision）」，会让用户误以为填了 Key 就走插件直连、不配 AstrBot Provider 也能用，与 STT 那处遗漏同根。修正范围（用户选定「描述 + README/CONFIG 同步」）：① `_conf_schema.json` 三键描述改为「仅供面板连通性测试按钮使用，运行时走 AstrBot Provider」；② `pages/admin/index.html` 三张服务卡「自定义模式」的 API Key placeholder 与 config-hint 同步纠正（原文案「选中即以该模型独立调用，不依赖默认服务商」）；③ `CONFIG_TEMPLATE.md` 第 ⑦ 节 `tts_voice` 行「依赖」列由「直连 / AstrBot Provider」改为「AstrBot TTS provider」并补「完全走 Provider，音色透传」。README 第 3 节增强功能段（图片转述/Embedding/Rerank）与 `THIRD_PARTY_ACCESS_CARD.md` 经核对已正确指向 Provider，未改动。版本四件套 **4.9.8 → 4.9.9**。
 

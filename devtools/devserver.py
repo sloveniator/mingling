@@ -37,7 +37,7 @@ from typing import Any, Dict
 from urllib.parse import parse_qs, unquote, urlparse
 
 _PLUGIN_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_PKG = "astrbot_plugin_mingbu"
+_PKG = "mingling"
 
 sys.path.insert(0, _PLUGIN_DIR)
 
@@ -154,7 +154,7 @@ class DevContext:
 # ══════════════════════════════════════════════════════════════
 
 def _build_star(context: DevContext):
-    from astrbot_plugin_mingbu.stars.admin import StarAdmin
+    from mingling.stars.admin import StarAdmin
 
     class DevStarAdmin(StarAdmin):
         async def get_kv_data(self, key, default=None):
@@ -223,7 +223,7 @@ SEED_GROUP_DIALOG = [
 
 async def seed(star, force: bool = False):
     """写入演示数据。已有数据时默认跳过。"""
-    from astrbot_plugin_mingbu.core import Relationship
+    from mingling.core import Relationship
 
     existing = await star._active_uids()
     if existing and not force:
@@ -371,7 +371,7 @@ class Handler(BaseHTTPRequestHandler):
     server_version = "MingbuDevServer/1.0"
     runtime: "AsyncRuntime | None" = None      # 由 main 注入
     routes: Dict[str, Any] = {}
-    plugin_name: str = "astrbot_plugin_mingbu"
+    plugin_name: str = "mingling"
     access_log: list = []
 
     def log_message(self, fmt, *args):
@@ -532,7 +532,7 @@ def main():
 
     Handler.runtime = runtime
     Handler.routes = ctx.routes
-    from astrbot_plugin_mingbu.core import PLUGIN_NAME
+    from mingling.core import PLUGIN_NAME
     Handler.plugin_name = PLUGIN_NAME
 
     httpd = ThreadingHTTPServer((args.host, args.port), Handler)

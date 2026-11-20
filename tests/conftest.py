@@ -19,7 +19,7 @@ import sys
 import types
 
 _PLUGIN_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_PKG = "astrbot_plugin_mingbu"
+_PKG = "mingling"
 
 sys.path.insert(0, _PLUGIN_DIR)
 
@@ -27,7 +27,7 @@ sys.path.insert(0, _PLUGIN_DIR)
 #
 # 这里不能写 `from devtools.astrbot_stub import ...`：那样 devtools 会作为
 # 扁平顶层包先加载一份，随后 bootstrap_plugin_modules() 又以
-# astrbot_plugin_mingbu.devtools 加载第二份。同一份源码执行两遍，
+# mingling.devtools 加载第二份。同一份源码执行两遍，
 # _CURRENT_REQUEST 这类模块级 ContextVar 就会分裂成两个——测试设置的请求
 # 与 Web handler 读到的请求分属不同副本，管理面板 API 测试会莫名其妙拿到
 # LookupError。tests/test_astrbot_stub_identity.py 守的正是这条不变量。

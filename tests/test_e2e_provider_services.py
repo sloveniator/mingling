@@ -27,7 +27,7 @@ tests/test_e2e_provider_services.py -- 能力服务商 + 外部服务卡片 端�
 import asyncio
 import importlib
 
-import astrbot_plugin_mingbu.http_client as hc
+import mingling.http_client as hc
 from test_admin_api import build_star, call, payload_of
 
 
@@ -175,7 +175,7 @@ def test_connectivity_provider_unconfigured_uses_default_ok():
 
 # ── 5) 外部服务「自定义模式」TTS 真发 HTTP 到正确端点 ──────────
 def test_external_tts_custom_mode_live_http(monkeypatch):
-    pr = importlib.import_module("astrbot_plugin_mingbu.provider_router")
+    pr = importlib.import_module("mingling.provider_router")
     star = _make_star()
     captured = {}
 
@@ -199,7 +199,7 @@ def test_external_tts_custom_mode_live_http(monkeypatch):
 
 # ── 6) 外部服务「自定义模式」Embedding 真发 HTTP 到正确端点 ────
 def test_external_embedding_custom_mode_live_http(monkeypatch):
-    pr = importlib.import_module("astrbot_plugin_mingbu.provider_router")
+    pr = importlib.import_module("mingling.provider_router")
     star = _make_star()
     captured = {}
 

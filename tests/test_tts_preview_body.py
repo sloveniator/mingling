@@ -38,7 +38,7 @@ def _fake_tts_factory(captured):
 
 def _run_preview(star, handler, body):
     """生产同形调用：路由层对 handler 无参调用，body 由请求上下文注入。"""
-    from astrbot_plugin_mingbu.stars.apis import tts_voices
+    from mingling.stars.apis import tts_voices
 
     captured = {}
     with patch.object(tts_voices, "_direct_dashscope_tts", _fake_tts_factory(captured)):
@@ -90,7 +90,7 @@ def test_voices_body_api_key_beats_empty_config(star):
     build_star 默认配置无 tts_api_key；若 body 注入失效，接口会返回
     「缺少 DashScope API Key」错误。打桩 /models 校验请求，返回合法结构。
     """
-    import astrbot_plugin_mingbu.http_client as http_client
+    import mingling.http_client as http_client
 
     async def fake_request_json(*args, **kwargs):
         return {"object": "list", "data": [{"id": "qwen3-tts-instruct-flash"}]}
@@ -116,7 +116,7 @@ def test_voices_skip_verify_no_key_returns_builtin(star):
     前端「音色 (voice)」下拉页面加载即自动填充（skip_verify），此时用户
     可能还没配 DashScope Key——接口绝不能报「缺少 Key」。
     """
-    import astrbot_plugin_mingbu.http_client as http_client
+    import mingling.http_client as http_client
 
     def _fail(*args, **kwargs):
         raise AssertionError("skip_verify 模式不得发起任何外部 HTTP 调用")
@@ -138,7 +138,7 @@ def test_voices_skip_verify_no_key_returns_builtin(star):
 
 def test_voices_skip_verify_with_key_skips_http(star):
     """skip_verify=True 且带 Key：同样不发起外部调用（下拉填充零成本）。"""
-    import astrbot_plugin_mingbu.http_client as http_client
+    import mingling.http_client as http_client
 
     def _fail(*args, **kwargs):
         raise AssertionError("skip_verify 模式不得发起任何外部 HTTP 调用")

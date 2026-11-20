@@ -2,7 +2,7 @@ name: mingling
 display_name: 命灵·AI伴侣
 desc: 拟人陪伴系统方法论的开源参考实现。集成记忆生命周期、人格连续建模、关系网络识别、主动行为编排、对话权重评估等12项工程技法，打造有"生命感"的AI伙伴。命理模块作为后台静默洞察，默认不主动出场。
 short_desc: 拟人陪伴技法集 · 记忆/人格/主动/成长
-version: 4.9.9
+version: 5.0.0
 author: Slceleto
 # repo 在 AstrBot 中用于插件更新检查与来源溯源，插件市场规范（schema 2026-06-27）
 # 亦将其列为 PluginRecord 的 MUST 字段；此前缺失会导致面板无法检查更新。

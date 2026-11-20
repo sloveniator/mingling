@@ -1,4 +1,4 @@
-# astrbot_plugin_mingbu — 工程化配置（P2-7：ruff + mypy 基线）
+# mingling — 工程化配置（P2-7：ruff + mypy 基线）
 # 在隔离环境中通过 venv 安装 dev 工具：
 #   python -m venv .venv && .venv/Scripts/python -m pip install pytest ruff mypy aiohttp
 #   .venv/Scripts/python -m pytest tests/
@@ -6,9 +6,9 @@
 #   .venv/Scripts/python -m mypy .
 
 [project]
-name = "astrbot-plugin-mingbu"
+name = "astrbot-plugin-mingling"
 dynamic = ["version"]
-description = "AstrBot 神秘 AI 朋友插件（含暗盘能力）"
+description = "命灵 v5：AstrBot 1V1 状态层陪伴插件"
 requires-python = ">=3.9"
 dependencies = ["aiohttp>=3.9,<4.0"]
 

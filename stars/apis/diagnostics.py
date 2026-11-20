@@ -91,7 +91,7 @@ class DiagnosticsApiMixin(ApiHost):
         provider = getattr(self.core, "provider_router", None)
         return json_response({
             "ok": True,
-            "plugin": "astrbot_plugin_mingbu",
+            "plugin": "mingling",
             "initialized": bool(getattr(self.core, "_ensured", False)),
             "capabilities": capabilities,
             "dependencies": {

@@ -1,16 +1,9 @@
 """v5 核心逻辑单元测试（覆盖 Part 6 验收项）"""
-import sys
 import time
 
 import pytest
 
-sys.path.insert(0, "E:/Programs/mingling")
-sys.path.insert(0, "E:/Programs/mingling/devtools")
-
-from astrbot_stub import install_astrbot_stub
-
-install_astrbot_stub()
-
+# 测试桩由 tests/conftest.py 统一注入，这里不再硬编码开发者本机路径。
 from config import CompanionConfig
 from emotion_trace import EmotionTrace, detect_mood
 from open_loops import OpenLoopManager

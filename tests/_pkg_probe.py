@@ -2,7 +2,7 @@ import importlib
 import sys
 import types
 
-pkg = "astrbot_plugin_mingbu"
+pkg = "mingling"
 BASE = r"E:\Programs\命灵\astrbot_mingbu"
 if pkg not in sys.modules:
     m = types.ModuleType(pkg)

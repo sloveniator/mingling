@@ -141,7 +141,7 @@ def test_inject_text_part_elements_support_model_dump():
     """AstrBot 4.27.4 的 assemble_context 要求元素有 model_dump_for_context；
     注入的元素必须满足该契约（否则 agent run 崩溃: 'str' object has no
     attribute 'model_dump_for_context'）。"""
-    from astrbot_plugin_mingbu.util import inject_text_part
+    from mingling.util import inject_text_part
     req = FakeReq()
     part = inject_text_part(req, "测试注入文本")
     assert len(req.extra_user_content_parts) == 1
