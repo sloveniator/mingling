@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import sys
 import time
+from typing import Any
 
 # AstrBot 以包形式加载本文件（data.plugins.mingling.main），而下列业务模块
 # 使用短名导入。把插件目录加入 sys.path，保证包加载与 devtools 直接加载
@@ -28,6 +29,13 @@ from command_support import (
 )
 from config import CompanionConfig
 from emotion_trace import EmotionTrace, detect_mood
+from intent_router import (
+    detect_task,
+    is_distress,
+    normalize,
+    should_exit_counseling,
+    should_start_counseling,
+)
 from llm_default import ask_default
 from open_loops import OpenLoopManager
 from private_gate import companion_scope, is_private
@@ -153,10 +161,7 @@ class MinglingPlugin(Star):
         user_text = (event.message_str or "").strip()
 
         # 1. 观察用户消息（去重）
-        dedup_key = (umo, user_text[:50], int(time.time() // 60))
-        if dedup_key != self._last_observe_key:
-            self._last_observe_key = dedup_key
-            await self._observe_user_message(umo, user_text)
+        await self._observe_once(umo, user_text)
 
         # 2. 工具可见性
         has_bound_chart = bool(await self._store.load(umo, "chart_bound", False))
@@ -255,8 +260,131 @@ class MinglingPlugin(Star):
         if self._cfg.open_loop_enabled:
             await self._loops.observe_resolution(umo, text)
 
-    # ---------- 手动命令：调试 ----------
-    @filter.command("命灵状态")
+    async def _observe_once(self, umo: str, text: str) -> None:
+        """同一分钟同一消息只观察一次，避免 regex 入口与 LLM 钩子重复计数。"""
+        key = (umo, text[:50], int(time.time() // 60))
+        if key == self._last_observe_key:
+            return
+        self._last_observe_key = key
+        await self._observe_user_message(umo, text)
+
+    async def _start_counsel(self, umo: str, text: str) -> str:
+        topic = (text or "此刻的感受").strip()[:60]
+        await self._store.save(umo, "counseling_session", {
+            "active": True, "topic": topic, "started_at": time.time(),
+        })
+        await self._store.save(umo, "counseling_active", True)
+        if is_distress(text):
+            return (
+                "我在。听起来你现在不太好受。\n"
+                "不用急着说清楚，想到哪说到哪——最让你难受的是哪一部分？"
+            )
+        return "好，我在。你想从哪件事说起？"
+
+    async def _end_counsel(self, umo: str, text: str = "") -> str:
+        await self._store.save(umo, "counseling_session", {
+            "active": False, "ended_at": time.time(),
+        })
+        await self._store.save(umo, "counseling_active", False)
+        if "谢谢" in (text or ""):
+            return "不客气。今天先到这儿，照顾好自己，想接着聊随时找我。"
+        return "好，那我们先停在这儿。你能说出来已经很不容易了，之后想聊随时找我。"
+
+    async def _run_task(self, task: str, event: AstrMessageEvent, text: str):
+        handlers: dict[str, Any] = {
+            "status": self.cmd_status,
+            "chart": self.cmd_paipan,
+            "divination": self.cmd_bugua,
+            "tarot": self.cmd_tarot,
+            "my_chart": self.cmd_my_chart,
+            "set_chart": self.cmd_set_profile,
+            "method": self.cmd_method,
+            "mood": self.cmd_mood,
+            "health": self.cmd_health,
+            "growth": self.cmd_growth,
+        }
+        handler = handlers.get(task)
+        if handler is None:
+            return
+        if task in {"chart", "divination", "tarot", "set_chart", "method", "health"}:
+            gen = handler(event, text)
+        else:
+            gen = handler(event)
+        async for item in gen:
+            yield item
+
+    # ---------- 自然语言入口：所有私聊消息 ----------
+    @filter.regex(r"(?s).+")
+    async def auto_route(self, event: AstrMessageEvent):
+        """按语义进入功能或开解状态；不依赖斜杠命令。"""
+        if not self._cfg.enabled or not is_private(event):
+            return
+        raw = (getattr(event, "message_str", "") or "").strip()
+        text = normalize(raw)
+        if not text:
+            return
+
+        umo = event.unified_msg_origin
+        await self._observe_once(umo, text)
+
+        task = detect_task(text)
+        distress = is_distress(text)
+        # 纯情绪表达优先于“查心情”这类泛功能；健康诉求仍按任务处理
+        if task == "mood" and distress:
+            task = None
+        active = bool(await self._store.load(umo, "counseling_active", False))
+
+        # 非开解态听到“不想聊了/没事了”只当普通语义，不反向开启开解
+        if not active and should_exit_counseling(text):
+            return
+
+        if active:
+            # 自然退出：先收束，再决定是否继续处理同一句里的具体任务
+            if should_exit_counseling(text):
+                closing = await self._end_counsel(umo, text)
+                yield event.plain_result(closing)
+                if task:
+                    async for item in self._run_task(task, event, text):
+                        yield item
+                event.stop_event()
+                return
+
+            # 转向具体任务：先接住情绪，再处理任务，并结束开解态
+            if task:
+                await self._end_counsel(umo, text)
+                lead = (
+                    "我先接住你刚才的情绪，等你想细说时我都在。现在先把这件事处理好。"
+                    if distress else "好，我们先把这件事处理好。"
+                )
+                yield event.plain_result(lead)
+                async for item in self._run_task(task, event, text):
+                    yield item
+                event.stop_event()
+                return
+
+            # 仍在倾诉：不打断，交给带开解提示的默认模型继续回应
+            return
+
+        # 非开解态：明确功能意图优先；若同时有情绪，先简短承接
+        if task:
+            if distress:
+                yield event.plain_result("我先接住你现在的感受，等你想细说时我都在。")
+            handled = False
+            async for item in self._run_task(task, event, text):
+                handled = True
+                yield item
+            if handled:
+                event.stop_event()
+            return
+
+        # 情绪困扰/想倾诉：自然进入开解，不显示任何模式或命令
+        if distress or should_start_counseling(text):
+            opening = await self._start_counsel(umo, text)
+            yield event.plain_result(opening)
+            event.stop_event()
+            return
+
+    # ---------- 内部功能实现（无斜杠注册） ----------
     async def cmd_status(self, event: AstrMessageEvent):
         if not companion_scope(self._cfg, event):
             return
@@ -318,7 +446,6 @@ class MinglingPlugin(Star):
             "name": birth.get("name", ""),
         }
 
-    @filter.command("排盘")
     async def cmd_paipan(self, event: AstrMessageEvent, question: str = ""):
         if not self._cfg.enabled or not is_private(event):
             return
@@ -330,8 +457,8 @@ class MinglingPlugin(Star):
         if not birth:
             yield event.plain_result(
                 "📋 还没有你的命盘档案。\n"
-                "请发送：/设置命盘 1990年5月20日早上8点 男\n"
-                "设置后我就能替你排盘。"
+                "能先告诉我你的公历出生年月日、具体钟点和性别吗？\n"
+                "比如：1990年5月20日早上8点，男。"
             )
             return
         q = self._cmd_arg(event, question, "排盘")
@@ -356,7 +483,6 @@ class MinglingPlugin(Star):
                 "稍后再试即可。"
             )
 
-    @filter.command("卜卦")
     async def cmd_bugua(self, event: AstrMessageEvent, question: str = ""):
         if not self._cfg.enabled or not is_private(event):
             return
@@ -367,9 +493,9 @@ class MinglingPlugin(Star):
         if not q:
             yield event.plain_result(
                 "🔮 请直接告诉我你想占卜的具体问题，例如：\n"
-                "• /卜卦 我该不该换工作？\n"
-                "• /卜卦 这次考试能过吗？\n"
-                "• /卜卦 我和 TA 的感情发展如何？"
+                "• 我该不该换工作？\n"
+                "• 这次考试能过吗？\n"
+                "• 我和 TA 的感情发展如何？"
             )
             return
         try:
@@ -384,7 +510,6 @@ class MinglingPlugin(Star):
         )
         yield event.plain_result(text or "🔮 卦已起，但默认模型暂时不可用，稍后再试。")
 
-    @filter.command("塔罗")
     async def cmd_tarot(self, event: AstrMessageEvent, question: str = ""):
         if not self._cfg.enabled or not is_private(event):
             return
@@ -407,21 +532,19 @@ class MinglingPlugin(Star):
                 format_tarot(spread) + "\n\n✨ 默认模型暂时不可用，先看看牌面。"
             )
 
-    @filter.command("我的命盘")
     async def cmd_my_chart(self, event: AstrMessageEvent):
         if not self._cfg.enabled or not is_private(event):
             return
         birth = await self._get_birth(event.unified_msg_origin)
         if birth:
             yield event.plain_result(
-                f"📋 你的命盘档案：\n{format_birth(birth)}\n\n我已经记住了，随时可以 /排盘。"
+                f"📋 你的命盘档案：\n{format_birth(birth)}\n\n我已经记住了，想排盘时直接跟我说就行。"
             )
         else:
             yield event.plain_result(
-                "📋 还没有你的命盘档案。\n请发送：/设置命盘 1990年5月20日早上8点 男"
+                "📋 还没有你的命盘档案。\n能告诉我你的公历出生年月日、具体钟点和性别吗？"
             )
 
-    @filter.command("设置命盘")
     async def cmd_set_profile(self, event: AstrMessageEvent, text: str = ""):
         if not self._cfg.enabled or not is_private(event):
             return
@@ -431,18 +554,17 @@ class MinglingPlugin(Star):
             await self._save_birth(event.unified_msg_origin, birth)
             yield event.plain_result(
                 f"✅ 已记住你的出生信息：{format_birth(birth)}\n"
-                "现在可以 /排盘 或 /我的命盘。"
+                "以后想排盘，直接跟我说就行。"
             )
             return
         current = await self._get_birth(event.unified_msg_origin)
         cur = f"\n📌 当前存档：{format_birth(current)}\n" if current else ""
         yield event.plain_result(
             f"📋 请告诉我你的出生信息：{cur}\n"
-            "格式示例：/设置命盘 1990年5月20日早上8点 男\n"
-            "公历、具体钟点、性别三项即可。"
+            "比如：1990年5月20日早上8点，男。\n"
+            "公历日期、具体钟点、性别三项即可。"
         )
 
-    @filter.command("命理方法")
     async def cmd_method(self, event: AstrMessageEvent, method: str = ""):
         if not self._cfg.enabled or not is_private(event):
             return
@@ -454,13 +576,15 @@ class MinglingPlugin(Star):
         m = self._cmd_arg(event, method, "命理方法")
         if not m:
             yield event.plain_result(
-                "🔮 用法：/命理方法 紫微|八字|六爻|奇门|梅花|自动\n"
-                "当前默认：自动（有出生信息走命盘，否则走六爻）。"
+                "你想用哪种方法？紫微、八字、六爻、奇门、梅花，或者自动。\n"
+                "当前默认是自动：有出生信息就走命盘，否则走六爻。"
             )
             return
         key = mapping.get(m)
         if not key:
-            yield event.plain_result("⚠️ 没认出这个方法。可选：紫微 / 八字 / 六爻 / 奇门 / 梅花 / 自动。")
+            key = next((v for k, v in mapping.items() if k in m), None)
+        if not key:
+            yield event.plain_result("我没认出这个方法。紫微、八字、六爻、奇门、梅花、自动，你想用哪个？")
             return
         umo = event.unified_msg_origin
         birth = await self._get_birth(umo)
@@ -470,7 +594,6 @@ class MinglingPlugin(Star):
         await self._store.save(umo, "birth_profile", birth)
         yield event.plain_result(f"✅ 已设置后台测算方法：{key}。")
 
-    @filter.command("心情")
     async def cmd_mood(self, event: AstrMessageEvent):
         if not self._cfg.enabled or not is_private(event):
             return
@@ -485,46 +608,9 @@ class MinglingPlugin(Star):
             f"情绪四维：愉悦 {emo.pleasantness:.2f} / 紧张 {emo.tension:.2f} "
             f"/ 唤醒 {emo.arousal:.2f} / 确定 {emo.certainty:.2f}\n"
             f"当前话题：{topic or '无'}\n\n"
-            "想深入聊聊，可以 /开解 [话题]；想看命盘，可以 /排盘。"
+            "想深入聊聊，就把困扰告诉我；想看命盘，也可以直接问我。"
         )
 
-    @filter.command("开解")
-    async def cmd_counsel(self, event: AstrMessageEvent, topic: str = ""):
-        if not self._cfg.enabled or not is_private(event):
-            return
-        if not self._cfg.counseling_enabled:
-            yield event.plain_result("⚠️ 咨询功能当前未开启。")
-            return
-        t = self._cmd_arg(event, topic, "开解")
-        if not t:
-            yield event.plain_result(
-                "🧠 请告诉我你想探讨的话题，例如：\n"
-                "• /开解 工作方向\n• /开解 感情困惑\n• /开解 人生意义"
-            )
-            return
-        umo = event.unified_msg_origin
-        await self._store.save(umo, "counseling_session", {
-            "active": True, "topic": t, "started_at": time.time(),
-        })
-        await self._store.save(umo, "counseling_active", True)
-        yield event.plain_result(
-            f"🧠 来，咱聊聊「{t}」。\n\n"
-            f"先不急着下结论，你先说说——关于{t}，你心里最真实的那句是啥？"
-        )
-
-    @filter.command("结束开解")
-    async def cmd_end_counsel(self, event: AstrMessageEvent):
-        if not self._cfg.enabled or not is_private(event):
-            return
-        umo = event.unified_msg_origin
-        await self._store.save(umo, "counseling_session", {"active": False})
-        await self._store.save(umo, "counseling_active", False)
-        yield event.plain_result(
-            "🧠 好，这次先到这儿。\n"
-            "不管聊出个啥，你愿意跟我说这些，我就挺开心的。啥时候想接着聊，随时找我～"
-        )
-
-    @filter.command("健康")
     async def cmd_health(self, event: AstrMessageEvent, note: str = ""):
         if not self._cfg.enabled or not is_private(event):
             return
@@ -540,7 +626,7 @@ class MinglingPlugin(Star):
         if not raw:
             yield event.plain_result(
                 "💡 想给你定制健康建议，先告诉我一点基本情况吧～\n"
-                "例如：/健康 我每天12点睡7点起，一周运动2次，想改善睡眠"
+                "例如：我每天12点睡7点起，一周运动2次，想改善睡眠。"
             )
             return
         text = await self._ask(
@@ -575,7 +661,6 @@ class MinglingPlugin(Star):
         await self._store.append_timeline(umo, "growth_reflect", {"text": text[:300]})
         return text
 
-    @filter.command("成长")
     async def cmd_growth(self, event: AstrMessageEvent):
         if not self._cfg.enabled or not is_private(event):
             return
