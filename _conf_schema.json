@@ -279,6 +279,52 @@
     "description": "开启后，Bot 会定期生成成长反思。",
     "default": true
   },
+  "growth_global_mode": {
+    "type": "bool",
+    "title": "全局汇总成长反思",
+    "description": "开启后跨用户汇总为一份整体反思；关闭则回退为按用户分别生成。",
+    "default": true
+  },
+  "growth_signal_min_score": {
+    "type": "float",
+    "title": "成长信号最低分",
+    "description": "对话中打分低于该值的片段不进入全局打包。",
+    "default": 0.55,
+    "minimum": 0.0,
+    "maximum": 1.0
+  },
+  "growth_max_items": {
+    "type": "int",
+    "title": "全局打包最大条数",
+    "description": "全局反思最多纳入的高价值片段数，超限按分数降序截断。",
+    "default": 60,
+    "minimum": 5,
+    "maximum": 500
+  },
+  "growth_token_budget": {
+    "type": "int",
+    "title": "全局打包 Token 预算",
+    "description": "打包片段的估算 token 上限，超限截断并记录。",
+    "default": 3000,
+    "minimum": 200,
+    "maximum": 20000
+  },
+  "growth_dedupe_threshold": {
+    "type": "float",
+    "title": "去重相似度阈值",
+    "description": "字符二元组 Jaccard 相似度达到该值时合并重复片段。",
+    "default": 0.82,
+    "minimum": 0.5,
+    "maximum": 1.0
+  },
+  "growth_signal_max_per_user": {
+    "type": "int",
+    "title": "每用户信号保留上限",
+    "description": "对话中打分的成长信号每用户最多保留条数。",
+    "default": 200,
+    "minimum": 20,
+    "maximum": 1000
+  },
   "dream_engine_enabled": {
     "type": "bool",
     "title": "启用梦境/预感",

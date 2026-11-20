@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>命灵 · 控制台</title>
-    <link rel="stylesheet" href="./style.css?v=5.4.1" />
+    <link rel="stylesheet" href="./style.css?v=5.5.0" />
   </head>
   <body>
     <div class="bg-grid"></div>
@@ -13,7 +13,7 @@
         <div class="brand">
           <div class="sigil">命</div>
           <div>
-            <h1>命灵 <span id="version">5.4.1</span></h1>
+            <h1>命灵 <span id="version">5.5.0</span></h1>
             <p class="sub">1V1 状态层 · 自然语言意图 · 关系记忆</p>
           </div>
         </div>
@@ -129,6 +129,19 @@
             </div>
 
             <div class="panel">
+              <div class="panel-head"><h2>成长反思</h2><span class="muted">默认全局汇总为一份</span></div>
+              <div class="form-grid">
+                <label class="switch"><input type="checkbox" data-key="growth_global_mode" data-type="bool" /><span>全局汇总模式</span></label>
+                <label class="switch"><input type="checkbox" data-key="growth_engine_enabled" data-type="bool" /><span>启用成长反思</span></label>
+                <label>信号最低分<input type="number" step="0.05" min="0" max="1" data-key="growth_signal_min_score" data-type="float" /></label>
+                <label>最大打包条数<input type="number" min="5" max="500" data-key="growth_max_items" data-type="int" /></label>
+                <label>Token 预算<input type="number" min="200" max="20000" data-key="growth_token_budget" data-type="int" /></label>
+                <label>去重相似度<input type="number" step="0.01" min="0.5" max="1" data-key="growth_dedupe_threshold" data-type="float" /></label>
+                <label>每用户信号上限<input type="number" min="20" max="1000" data-key="growth_signal_max_per_user" data-type="int" /></label>
+              </div>
+            </div>
+
+            <div class="panel">
               <div class="panel-head"><h2>功能开关</h2></div>
               <div class="form-grid">
                 <label class="switch"><input type="checkbox" data-key="counseling_enabled" data-type="bool" /><span>命理/开解</span></label>
@@ -168,6 +181,6 @@
     </div>
 
     <div id="toast" class="toast"></div>
-    <script type="module" src="./app.js?v=5.4.1"></script>
+    <script type="module" src="./app.js?v=5.5.0"></script>
   </body>
 </html>

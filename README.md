@@ -16,7 +16,7 @@
 > **技法先于角色，工程优于人设**：本插件是**拟人陪伴系统方法论的开源参考实现**——它是聊天机器人有温度、有记忆、会成长的「灵魂」，而不是一个算命工具。插件把记忆生命周期管理、人格连续性建模、关系网络识别、主动行为编排、对话权重评估、世界观转译等 12 项经过验证的工程技法，组合为一套可扩展的有「生命感」的聊天伙伴框架；命理（八字/紫微/六爻等）只作为后台静默洞察通道，把结论伪装成「直觉」织入对话，默认绝不主动以「算命」面貌出场。
 
 [![AstrBot](https://img.shields.io/badge/AstrBot-4.26%2B-purple)](https://github.com/Soulter/AstrBot)
-[![version](https://img.shields.io/badge/version-5.4.1-gold)](#版本演进)
+[![version](https://img.shields.io/badge/version-5.5.0-gold)](#版本演进)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ---
@@ -416,6 +416,8 @@ services:
 ## 版本演进
 
 > 按版本号倒序排列（最新在前），每个版本标注核心技法突破。
+
+**v5.5.0** · **成长反思改为全局汇总 + 对话中打分**——① 新增对话中规则打分器（决策/事件/反思/情绪/结论、长度、时间、因果、低价值惩罚），每条私聊消息写入 `growth_signals`；② 周任务默认跨用户打包为一份整体反思，按分数阈值筛选、字符二元组 Jaccard 去重、条数与 token 预算截断；③ 统计筛选前/后条数、过滤/去重/截断数量与估算 token 对比，记录来源 ID 但不按用户分节输出；④ 新增 `growth_global_mode` 回退开关，关闭后恢复按用户反思；⑤ 无打分信号时降级用关系记忆 `strength/anchor` 合成候选；⑥ 面板新增成长反思配置组，新增打分/打包/回退测试。版本四件套 **5.4.1 → 5.5.0**。
 
 **v5.4.1** · **管理面板 API 兼容 AstrBot 4.29**——① AstrBot 4.29 的 `register_web_api` 不向 handler 传 request，改用全局 `astrbot.api.web.request` 代理，原 `(self, request)` 签名导致三个接口全 500；已改为可选参数并自动解析全局代理；② 响应改用官方 `astrbot.api.web.json_response`，状态码正确透传；③ 测试桩同步支持 `status_code`。版本四件套 **5.4.0 → 5.4.1**。
 

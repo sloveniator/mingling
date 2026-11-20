@@ -75,6 +75,23 @@ class Store:
     async def save(self, umo: str, suffix: str, value: Any) -> None:
         await self.kv_set(f"mingling.{_umo_hash(umo)}.{suffix}", value)
 
+    # ---------- 成长信号（对话中打分） ----------
+    async def append_growth_signal(self, umo: str, signal: dict,
+                                   max_items: int = 200) -> None:
+        """保存一条消息的成长价值分；同一文本只保留最新一条。"""
+        if not isinstance(signal, dict) or not (signal.get("text") or "").strip():
+            return
+        raw = await self.load(umo, "growth_signals", [])
+        items = raw if isinstance(raw, list) else []
+        text = str(signal.get("text", "")).strip()
+        for i, old in enumerate(items):
+            if isinstance(old, dict) and str(old.get("text", "")).strip() == text:
+                items[i] = signal
+                break
+        else:
+            items.append(signal)
+        await self.save(umo, "growth_signals", items[-max(1, max_items):])
+
     # ---------- 时间线 ----------
     def _timeline_path(self, umo: str) -> Path:
         return self._timeline_dir / f"{_umo_hash(umo)}.jsonl"

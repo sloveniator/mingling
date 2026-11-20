@@ -55,6 +55,13 @@ class CompanionConfig:
     tarot_enabled: bool = True
     health_enabled: bool = True
     growth_engine_enabled: bool = True
+    # 成长反思：全局汇总（默认）或按用户回退
+    growth_global_mode: bool = True
+    growth_signal_min_score: float = 0.55
+    growth_max_items: int = 60
+    growth_token_budget: int = 3000
+    growth_dedupe_threshold: float = 0.82
+    growth_signal_max_per_user: int = 200
 
     # StateLayer 预算
     state_layer_max_tokens: int = 220
@@ -113,6 +120,7 @@ class CompanionConfig:
             "proactive_enabled", "divination_tools_enabled", "counseling_tools_enabled",
             "counseling_enabled", "tarot_enabled", "health_enabled",
             "growth_engine_enabled", "semantic_router_enabled",
+            "growth_global_mode",
         )
         for name in bool_fields:
             if name in raw:
@@ -126,7 +134,8 @@ class CompanionConfig:
             "proactive_max_unanswered_open_loop", "proactive_max_unanswered_daily",
             "open_loop_window_days", "relation_memory_max_items",
             "timeline_max_lines", "semantic_router_timeout",
-            "semantic_router_min_chars",
+            "semantic_router_min_chars", "growth_max_items",
+            "growth_token_budget", "growth_signal_max_per_user",
         )
         for name in int_fields:
             if name in raw:
@@ -134,7 +143,8 @@ class CompanionConfig:
 
         float_fields = (
             "emotion_anchor_threshold", "emotion_anchor_multiplier",
-            "semantic_router_confidence",
+            "semantic_router_confidence", "growth_signal_min_score",
+            "growth_dedupe_threshold",
         )
         for name in float_fields:
             if name in raw:

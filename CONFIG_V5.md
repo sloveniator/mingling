@@ -23,6 +23,12 @@ AstrBot 面板会把本文件对应的 JSON 作为 `mingling` 插件配置。
   "tarot_enabled": true,
   "health_enabled": true,
   "growth_engine_enabled": true,
+  "growth_global_mode": true,
+  "growth_signal_min_score": 0.55,
+  "growth_max_items": 60,
+  "growth_token_budget": 3000,
+  "growth_dedupe_threshold": 0.82,
+  "growth_signal_max_per_user": 200,
   "state_layer_max_tokens": 220,
   "state_layer_max_anchors": 2,
   "proactive_max_per_day": 2,
@@ -60,6 +66,12 @@ AstrBot 面板会把本文件对应的 JSON 作为 `mingling` 插件配置。
 | `tarot_enabled` | bool | `true` | 塔罗能力开关。 |
 | `health_enabled` | bool | `true` | 健康建议能力开关。 |
 | `growth_engine_enabled` | bool | `true` | 成长反思与每周成长任务开关。 |
+| `growth_global_mode` | bool | `true` | `true` 全局汇总一份反思；`false` 回退按用户分别生成。 |
+| `growth_signal_min_score` | float | `0.55` | 对话中打分低于该值的片段不进入全局打包。 |
+| `growth_max_items` | int | `60` | 全局打包最大条数，超限按分数降序截断。 |
+| `growth_token_budget` | int | `3000` | 打包片段的估算 token 上限。 |
+| `growth_dedupe_threshold` | float | `0.82` | 字符二元组 Jaccard 去重阈值。 |
+| `growth_signal_max_per_user` | int | `200` | 每用户成长信号保留上限。 |
 | `state_layer_max_tokens` | int | `220` | 状态层注入预算。 |
 | `state_layer_max_anchors` | int | `2` | 单次最多注入记忆条数。 |
 | `proactive_max_per_day` | int | `2` | 每日主动消息上限。 |

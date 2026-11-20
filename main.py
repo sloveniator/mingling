@@ -30,6 +30,8 @@ from command_support import (
 )
 from config import CompanionConfig
 from emotion_trace import EmotionTrace, detect_mood
+from growth_global import build_global_growth_prompt, build_growth_pack
+from growth_signal import score_growth_signal
 from intent_router import (
     detect_task,
     is_distress,
@@ -163,16 +165,7 @@ class MinglingPlugin(Star):
             logger.error(f"[mingling] 注册 cron 失败\n{traceback.format_exc()}")
 
         async def _growth_all() -> None:
-            if not self._cfg.growth_engine_enabled:
-                return
-            for umo in await self._store.list_known_umos():
-                try:
-                    await self._build_growth_note(umo)
-                except Exception:
-                    import traceback
-                    logger.error(
-                        f"[mingling] growth reflect failed: {umo}\n{traceback.format_exc()}"
-                    )
+            await self._run_growth_batch()
 
         try:
             await self._add_cron_job(
@@ -213,7 +206,13 @@ class MinglingPlugin(Star):
 
         # 3. 构建并追加 StateLayer
         body = await self._state_layer.build(umo, user_text)
-        growth = await self._store.load(umo, "growth_note", {})
+        growth = {}
+        if self._cfg.growth_global_mode:
+            global_note = await self._store.kv_get("mingling.growth.global", {})
+            if isinstance(global_note, dict) and global_note.get("text"):
+                growth = global_note
+        if not (isinstance(growth, dict) and growth.get("text")):
+            growth = await self._store.load(umo, "growth_note", {})
         if isinstance(growth, dict) and growth.get("text"):
             body = (body + "\n" + (
                 "你最近的成长觉察：" + str(growth["text"])[:220]
@@ -280,6 +279,15 @@ class MinglingPlugin(Star):
             topic = await self._topics.observe(umo, text)
             if self._cfg.open_loop_enabled and topic:
                 await self._loops.register(umo, topic, emotion=mood or "neutral")
+
+        # 对话中打分：每条私聊消息写入成长信号，供全局反思筛选
+        try:
+            signal = score_growth_signal(text, mood=mood, topic=topic)
+            await self._store.append_growth_signal(
+                umo, signal, max_items=self._cfg.growth_signal_max_per_user
+            )
+        except Exception:
+            pass
 
         # 关系记忆：把有情绪峰值或新话题的互动写成锚点，供后续状态层引用
         if self._cfg.relation_memory_enabled and topic:
@@ -697,6 +705,124 @@ class MinglingPlugin(Star):
             text or "💡 已记住你的情况，但默认模型暂时不可用，稍后再问我。"
         )
 
+    async def _collect_growth_signals(self) -> tuple[list[dict], dict]:
+        """收集所有用户的成长信号；缺失时降级到关系记忆。"""
+        umos = await self._store.list_known_umos()
+        signals: list[dict] = []
+        users_with_signals = 0
+        users_fallback = 0
+        fallback_items = 0
+        for umo in umos:
+            raw = await self._store.load(umo, "growth_signals", [])
+            if isinstance(raw, list) and raw:
+                users_with_signals += 1
+                for item in raw:
+                    if not isinstance(item, dict):
+                        continue
+                    signals.append({
+                        "text": item.get("text", ""),
+                        "score": float(item.get("score", 0.0)),
+                        "tags": item.get("tags", []),
+                        "ts": float(item.get("ts", 0.0)),
+                        "umo": umo,
+                    })
+                continue
+
+            # 降级：该用户没有打分信号，用关系记忆合成候选
+            users_fallback += 1
+            memories = await self._store.load(umo, "relation_memory", [])
+            if not isinstance(memories, list):
+                continue
+            for m in memories:
+                if not isinstance(m, dict):
+                    continue
+                topic = str(m.get("topic", "")).strip()
+                content = str(m.get("content", "")).strip()
+                if not content:
+                    continue
+                strength = float(m.get("strength", 1.0))
+                anchor = bool(m.get("anchor", False))
+                score = min(0.95, 0.38 + 0.18 * strength + (0.12 if anchor else 0.0))
+                fallback_items += 1
+                signals.append({
+                    "text": f"{topic}：{content}" if topic else content,
+                    "score": round(score, 3),
+                    "tags": ["fallback:relation_memory"] + (["anchor"] if anchor else []),
+                    "ts": float(m.get("last_access") or m.get("created_at") or 0.0),
+                    "umo": umo,
+                })
+        meta = {
+            "users": len(umos),
+            "users_with_signals": users_with_signals,
+            "users_fallback": users_fallback,
+            "fallback_items": fallback_items,
+        }
+        if users_fallback:
+            logger.info(
+                f"[mingling.growth] 降级：{users_fallback}/{len(umos)} 个用户无打分信号，"
+                f"使用关系记忆合成 {fallback_items} 条候选"
+            )
+        return signals, meta
+
+    async def _build_global_growth_note(self) -> str:
+        """全局汇总：跨用户筛选后只生成一份整体反思。"""
+        signals, meta = await self._collect_growth_signals()
+        pack = build_growth_pack(
+            signals,
+            min_score=self._cfg.growth_signal_min_score,
+            max_items=self._cfg.growth_max_items,
+            token_budget=self._cfg.growth_token_budget,
+            dedupe_threshold=self._cfg.growth_dedupe_threshold,
+        )
+        stats = dict(pack["stats"])
+        stats.update(meta)
+        stats["mode"] = "global"
+
+        if not pack["items"]:
+            text = "最近还没有足够有价值的片段，这次先不生成整体反思。"
+        else:
+            text = await self._ask(
+                build_global_growth_prompt(pack),
+                session_id="mingling_growth_global",
+            )
+            if not text:
+                text = "默认模型暂时不可用，这次没有生成新的整体反思。"
+
+        note = {
+            "text": text,
+            "at": time.time(),
+            "mode": "global",
+            "stats": stats,
+            "sources": [
+                {"umo": i.get("umo", ""), "ts": i.get("ts", 0)} for i in pack["items"]
+            ],
+        }
+        await self._store.kv_set("mingling.growth.global", note)
+        logger.info(
+            "[mingling.growth] 全局反思完成："
+            f"before={stats['before_count']} after={stats['after_count']} "
+            f"filtered={stats['filtered_count']} dedupe={stats['dedupe_dropped']} "
+            f"count_trunc={stats['count_truncated']} token_trunc={stats['token_truncated']} "
+            f"tokens={stats['before_tokens']}->{stats['after_tokens']}({stats['token_method']})"
+        )
+        return text
+
+    async def _run_growth_batch(self) -> None:
+        """周任务入口：全局一份，或回退为按用户多份。"""
+        if not self._cfg.growth_engine_enabled:
+            return
+        if self._cfg.growth_global_mode:
+            await self._build_global_growth_note()
+            return
+        for umo in await self._store.list_known_umos():
+            try:
+                await self._build_growth_note(umo)
+            except Exception:
+                import traceback
+                logger.error(
+                    f"[mingling] growth reflect failed: {umo}\n{traceback.format_exc()}"
+                )
+
     async def _build_growth_note(self, umo: str) -> str:
         memories = await self._store.load(umo, "relation_memory", [])
         if not isinstance(memories, list):
@@ -726,6 +852,10 @@ class MinglingPlugin(Star):
             return
         if not self._cfg.growth_engine_enabled:
             yield event.plain_result("⚠️ 成长反思功能当前未开启。")
+            return
+        if self._cfg.growth_global_mode:
+            text = await self._build_global_growth_note()
+            yield event.plain_result(f"🌱 整体成长反思\n{text}")
             return
         text = await self._build_growth_note(event.unified_msg_origin)
         yield event.plain_result(f"🌱 成长反思\n{text}")
