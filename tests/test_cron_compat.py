@@ -45,3 +45,36 @@ def test_add_cron_job_sync_legacy_cron():
         handler=handler, description="d",
     ))
     assert calls == {"name": "j2", "expression": "0 3 * * 1"}
+
+
+def test_add_cron_job_deletes_same_name_duplicates():
+    from types import SimpleNamespace
+
+    deleted = []
+    added = []
+
+    class Manager:
+        async def list_jobs(self):
+            return [
+                SimpleNamespace(name="j3", job_id="old-1"),
+                SimpleNamespace(name="other", job_id="keep"),
+                SimpleNamespace(name="j3", job_id="old-2"),
+            ]
+
+        async def delete_job(self, job_id):
+            deleted.append(job_id)
+
+        async def add_basic_job(self, *, name, cron_expression, handler, description, timezone=None):
+            added.append(name)
+
+    plugin = object.__new__(MinglingPlugin)
+
+    async def handler():
+        return None
+
+    asyncio.run(plugin._add_cron_job(
+        Manager(), name="j3", expression="0 * * * *",
+        handler=handler, description="d",
+    ))
+    assert deleted == ["old-1", "old-2"]
+    assert added == ["j3"]

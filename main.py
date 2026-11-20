@@ -97,9 +97,26 @@ class MinglingPlugin(Star):
             self._client = None
         logger.info("[mingling] terminated")
 
+    async def _delete_existing_jobs(self, manager, name: str) -> None:
+        """删除同名旧任务，避免每次重启重复插入非持久化 cron。"""
+        list_jobs = getattr(manager, "list_jobs", None)
+        delete_job = getattr(manager, "delete_job", None)
+        if not callable(list_jobs) or not callable(delete_job):
+            return
+        jobs = list_jobs()
+        if inspect.isawaitable(jobs):
+            jobs = await jobs
+        for job in jobs or []:
+            if getattr(job, "name", "") != name:
+                continue
+            result = delete_job(getattr(job, "job_id", ""))
+            if inspect.isawaitable(result):
+                await result
+
     async def _add_cron_job(self, manager, *, name: str, expression: str,
                             handler, description: str) -> None:
         """兼容 AstrBot 不同版本的 cron 注册签名（cron/cron_expression，同步/异步）。"""
+        await self._delete_existing_jobs(manager, name)
         params = inspect.signature(manager.add_basic_job).parameters
         kwargs = {"name": name, "handler": handler, "description": description}
         if "cron_expression" in params:
