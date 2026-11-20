@@ -6,6 +6,10 @@ AstrBot 面板会把本文件对应的 JSON 作为 `mingling` 插件配置。
 ```json
 {
   "enabled": true,
+  "semantic_router_enabled": true,
+  "semantic_router_confidence": 0.65,
+  "semantic_router_timeout": 8,
+  "semantic_router_min_chars": 4,
   "state_layer_enabled": true,
   "emotion_trace_enabled": true,
   "relationship_event_enabled": true,
@@ -39,6 +43,10 @@ AstrBot 面板会把本文件对应的 JSON 作为 `mingling` 插件配置。
 | 键 | 类型 | 默认 | 说明 |
 |---|---|---|---|
 | `enabled` | bool | `true` | 总开关；关闭时不注册任何钩子。 |
+| `semantic_router_enabled` | bool | `true` | 正则未命中时是否用默认模型做语义兜底。 |
+| `semantic_router_confidence` | float | `0.65` | 语义分类置信度阈值，低于此值忽略。 |
+| `semantic_router_timeout` | int | `8` | 语义分类超时秒数，超时按普通聊天处理。 |
+| `semantic_router_min_chars` | int | `4` | 低于该字数的消息不调用分类模型。 |
 | `state_layer_enabled` | bool | `true` | 是否把状态层注入 `system_prompt`。 |
 | `emotion_trace_enabled` | bool | `true` | 记录情绪四维轨迹。 |
 | `relationship_event_enabled` | bool | `true` | 记录关系阶段变化。 |

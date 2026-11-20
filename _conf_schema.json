@@ -5,6 +5,36 @@
     "description": "总开关。关闭时插件不注册任何钩子；v5 本地构建默认开启。",
     "default": true
   },
+  "semantic_router_enabled": {
+    "type": "bool",
+    "title": "语义兜底识别",
+    "description": "正则未命中时，用 AstrBot 默认模型做一次轻量意图分类；失败或低置信度则按普通聊天处理。",
+    "default": true
+  },
+  "semantic_router_confidence": {
+    "type": "float",
+    "title": "语义识别置信度阈值",
+    "description": "模型分类置信度低于该值时忽略结果，交回普通聊天。",
+    "default": 0.65,
+    "minimum": 0.0,
+    "maximum": 1.0
+  },
+  "semantic_router_timeout": {
+    "type": "int",
+    "title": "语义识别超时（秒）",
+    "description": "分类调用超过该时间即放弃，不影响正常回复。",
+    "default": 8,
+    "minimum": 1,
+    "maximum": 30
+  },
+  "semantic_router_min_chars": {
+    "type": "int",
+    "title": "语义识别最小字数",
+    "description": "短于该长度的消息不调用模型，避免“嗯/好”等触发额外调用。",
+    "default": 4,
+    "minimum": 1,
+    "maximum": 20
+  },
   "state_layer_enabled": {
     "type": "bool",
     "title": "注入状态层",

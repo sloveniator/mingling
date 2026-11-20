@@ -34,6 +34,12 @@ class CompanionConfig:
     # v5 本地构建默认开启：升级后不应因缺少 enabled 键而静默失效。
     enabled: bool = True
 
+    # 自然语言意图：正则快速路径 + 默认模型语义兜底
+    semantic_router_enabled: bool = True
+    semantic_router_confidence: float = 0.65
+    semantic_router_timeout: int = 8
+    semantic_router_min_chars: int = 4
+
     # 子开关（仅 enabled=True 时生效）
     state_layer_enabled: bool = True
     emotion_trace_enabled: bool = True
@@ -106,7 +112,7 @@ class CompanionConfig:
             "topic_stack_enabled", "open_loop_enabled", "relation_memory_enabled",
             "proactive_enabled", "divination_tools_enabled", "counseling_tools_enabled",
             "counseling_enabled", "tarot_enabled", "health_enabled",
-            "growth_engine_enabled",
+            "growth_engine_enabled", "semantic_router_enabled",
         )
         for name in bool_fields:
             if name in raw:
@@ -119,13 +125,17 @@ class CompanionConfig:
             "proactive_quiet_start_hour", "proactive_quiet_end_hour",
             "proactive_max_unanswered_open_loop", "proactive_max_unanswered_daily",
             "open_loop_window_days", "relation_memory_max_items",
-            "timeline_max_lines",
+            "timeline_max_lines", "semantic_router_timeout",
+            "semantic_router_min_chars",
         )
         for name in int_fields:
             if name in raw:
                 setattr(cfg, name, _as_int(raw.get(name), getattr(cfg, name)))
 
-        float_fields = ("emotion_anchor_threshold", "emotion_anchor_multiplier")
+        float_fields = (
+            "emotion_anchor_threshold", "emotion_anchor_multiplier",
+            "semantic_router_confidence",
+        )
         for name in float_fields:
             if name in raw:
                 setattr(cfg, name, _as_float(raw.get(name), getattr(cfg, name)))

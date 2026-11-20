@@ -42,6 +42,8 @@ from private_gate import companion_scope, is_private
 from proactive_v2 import ProactiveEngine
 from relation_memory import RelationMemory
 from relationship import RelationshipManager
+from semantic_router import TASK_INTENTS, should_classify
+from semantic_router import classify as classify_intent
 from state_layer import StateLayerBuilder
 from store import Store
 from tool_visibility import ToolVisibilityContext, apply_tool_visibility
@@ -333,14 +335,39 @@ class MinglingPlugin(Star):
         if task == "mood" and distress:
             task = None
         active = bool(await self._store.load(umo, "counseling_active", False))
+        exit_phrase = should_exit_counseling(text)
 
-        # 非开解态听到“不想聊了/没事了”只当普通语义，不反向开启开解
-        if not active and should_exit_counseling(text):
+        # 混合模式：正则未命中时，用默认模型做一次轻量语义分类兜底。
+        # 正则已命中（task/distress/exit）不调用模型，避免额外成本。
+        if (
+            self._cfg.semantic_router_enabled
+            and not (task or distress or exit_phrase)
+            and should_classify(
+                text, active, min_chars=self._cfg.semantic_router_min_chars
+            )
+        ):
+            decision = await classify_intent(
+                self.context,
+                text,
+                active,
+                timeout=self._cfg.semantic_router_timeout,
+            )
+            if decision and decision.confidence >= self._cfg.semantic_router_confidence:
+                if decision.intent in TASK_INTENTS:
+                    task = decision.intent
+                if decision.counsel_action == "exit":
+                    exit_phrase = True
+                elif decision.counsel_action == "enter":
+                    distress = True
+
+        # 非开解态听到“不想聊了/没事了”只当普通语义，不反向开启开解；
+        # 但同一句里如果有明确任务，仍继续处理任务。
+        if not active and exit_phrase and not task:
             return
 
         if active:
             # 自然退出：先收束，再决定是否继续处理同一句里的具体任务
-            if should_exit_counseling(text):
+            if exit_phrase:
                 closing = await self._end_counsel(umo, text)
                 yield event.plain_result(closing)
                 if task:
