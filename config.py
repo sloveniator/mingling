@@ -44,6 +44,11 @@ class CompanionConfig:
     proactive_enabled: bool = True
     divination_tools_enabled: bool = True
     counseling_tools_enabled: bool = True
+    # 命令级开关（沿用 v4 配置键）
+    counseling_enabled: bool = True
+    tarot_enabled: bool = True
+    health_enabled: bool = True
+    growth_engine_enabled: bool = True
 
     # StateLayer 预算
     state_layer_max_tokens: int = 220
@@ -100,6 +105,8 @@ class CompanionConfig:
             "state_layer_enabled", "emotion_trace_enabled", "relationship_event_enabled",
             "topic_stack_enabled", "open_loop_enabled", "relation_memory_enabled",
             "proactive_enabled", "divination_tools_enabled", "counseling_tools_enabled",
+            "counseling_enabled", "tarot_enabled", "health_enabled",
+            "growth_engine_enabled",
         )
         for name in bool_fields:
             if name in raw:

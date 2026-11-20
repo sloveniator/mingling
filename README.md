@@ -1,16 +1,18 @@
 # 命灵 · AI 伴侣 — AstrBot 1V1 状态层插件（v5）
 
-> **v5.0.0 破坏性重构（已按上游 `sloveniator/mingling` HEAD 落地）**
-> 本版本砍掉角色收集、群聊观察、TTS/STT、命理指令、暗盘、成长/梦境等 v4 功能，
-> 只保留 **1V1 私聊状态层**：关系阶段、情绪轨迹、话题栈、未闭环话题、关系记忆、
-> 主动消息、状态层注入与 `/命灵状态` 调试命令。
+> **v5.1.0：破坏性重构 + 命理/咨询/成长回归**
+> 在 v5 的 1V1 状态层之上，恢复 `/排盘`、`/卜卦`、`/塔罗`、`/我的命盘`、
+> `/设置命盘`、`/命理方法`、`/心情`、`/开解`、`/结束开解`、`/健康`、`/成长`
+> 命令；所有命理/咨询/成长相关的 AI 生成统一走 **AstrBot 当前默认对话模型**，
+> 不读取插件自有 API Key。关系、情绪、关系记忆在每条私聊消息中自动更新，
+> 不依赖 `/命灵状态` 触发。
 > 插件标识与目录已统一为 `mingling`；升级前请先运行 `migrate_v4_to_v5.py` 迁移配置
 > 与 `plugin_data`，并阅读下方「v5 功能范围与迁移」。
 
 > **技法先于角色，工程优于人设**：本插件是**拟人陪伴系统方法论的开源参考实现**——它是聊天机器人有温度、有记忆、会成长的「灵魂」，而不是一个算命工具。插件把记忆生命周期管理、人格连续性建模、关系网络识别、主动行为编排、对话权重评估、世界观转译等 12 项经过验证的工程技法，组合为一套可扩展的有「生命感」的聊天伙伴框架；命理（八字/紫微/六爻等）只作为后台静默洞察通道，把结论伪装成「直觉」织入对话，默认绝不主动以「算命」面貌出场。
 
 [![AstrBot](https://img.shields.io/badge/AstrBot-4.26%2B-purple)](https://github.com/Soulter/AstrBot)
-[![version](https://img.shields.io/badge/version-5.0.0-gold)](#版本演进)
+[![version](https://img.shields.io/badge/version-5.1.0-gold)](#版本演进)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 ---
@@ -20,10 +22,14 @@
 **保留**：1V1 私聊状态层（关系阶段、情绪轨迹、话题栈、未闭环话题、关系记忆）、
 主动消息、`/命灵状态` 调试命令、管理 API（`/mingling/users`、`/mingling/timeline`）。
 
-**移除**：角色收集/切换、群聊观察、TTS/STT、排盘/卜卦/塔罗等命理指令、暗盘洞察、
-成长反思、梦境/预感、News/搜索、SocialGraph、TTS 音色库与旧管理面板业务。
+**v5.1 恢复**：`/排盘`、`/卜卦`、`/塔罗`、`/我的命盘`、`/设置命盘`、`/命理方法`、
+`/心情`、`/开解`、`/结束开解`、`/健康`、`/成长`。命盘/卦象由 `mingbu_api_url`
+指向的命理计算服务提供，解读与健康/成长建议由 AstrBot 默认对话模型生成。
 
-**配置**：v5 只读取 `CONFIG_V5.md` 列出的 24 个键；`_conf_schema.json` 仍保留旧键
+**仍未恢复**：角色收集/切换、群聊观察、TTS/STT、暗盘洞察、梦境/预感、
+News/搜索、SocialGraph、TTS 音色库与旧管理面板业务。
+
+**配置**：v5 只读取 `CONFIG_V5.md` 列出的 28 个键；`_conf_schema.json` 仍保留旧键
 以兼容历史配置，但旧键不再参与运行。`enabled` 默认 `true`。
 
 **迁移步骤**：
@@ -405,6 +411,8 @@ services:
 ## 版本演进
 
 > 按版本号倒序排列（最新在前），每个版本标注核心技法突破。
+
+**v5.1.0** · **命理/咨询/成长命令回归 + 状态层自动更新**——① 恢复 `/排盘`、`/卜卦`、`/塔罗`、`/我的命盘`、`/设置命盘`、`/命理方法`、`/心情`、`/开解`、`/结束开解`、`/健康`、`/成长` 共 11 个命令；② 排盘/卜卦调用命理计算服务，塔罗/健康/成长/解读统一走 `provider_router.default_llm_request`，即 AstrBot 当前默认对话模型，插件不再读取自有 API Key；③ 修复 v5 状态层只注入不更新的问题：每条私聊消息自动执行 `emotion.nudge`、`relationship.nudge`、`relation_memory.remember`，关系与记忆在聊天过程中自然增长；④ 开解会话通过状态层注入陪伴提示，`/结束开解` 清除；⑤ 新增每周成长反思 cron；⑥ 新增 `command_support.py`、`llm_default.py` 与对应测试。版本四件套 **5.0.0 → 5.1.0**。
 
 **v5.0.0** · **1V1 状态层破坏性重构 + 插件身份统一为 mingling**——按上游 `sloveniator/mingling` HEAD（`a04767b`）落地 v5：① 入口收敛为单一 LLM 钩子 + `/命灵状态` 命令，状态层由关系、情绪、话题栈、未闭环话题、关系记忆五路组成，按 token 预算注入 `system_prompt`；② 新增 `Store`（KV + jsonl 时间线）、`ProactiveEngine`、`AdminTimelineAPI`（`/mingling/users`、`/mingling/timeline`）；③ 插件标识、包名、目录、配置文件名统一为 `mingling`，`plugin_data` 根目录改为 `plugin_data/mingling`；④ 配置 schema 补齐 v5 实际读取的 24 个键，`enabled` 默认 `true`，并把旧版 `quiet_hours_*` 映射到 `proactive_quiet_*`；⑤ 新增 `migrate_v4_to_v5.py`，迁移旧配置与时间线文件；⑥ 删除 v4 的角色/群聊/TTS/STT/命理指令/暗盘/成长/梦境等运行链路。版本四件套 **4.9.9 → 5.0.0**。
 

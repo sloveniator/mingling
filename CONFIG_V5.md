@@ -15,6 +15,10 @@ AstrBot 面板会把本文件对应的 JSON 作为 `mingling` 插件配置。
   "proactive_enabled": true,
   "divination_tools_enabled": true,
   "counseling_tools_enabled": true,
+  "counseling_enabled": true,
+  "tarot_enabled": true,
+  "health_enabled": true,
+  "growth_engine_enabled": true,
   "state_layer_max_tokens": 220,
   "state_layer_max_anchors": 2,
   "proactive_max_per_day": 2,
@@ -44,6 +48,10 @@ AstrBot 面板会把本文件对应的 JSON 作为 `mingling` 插件配置。
 | `proactive_enabled` | bool | `true` | 主动消息总开关。 |
 | `divination_tools_enabled` | bool | `true` | 命理工具可见性。 |
 | `counseling_tools_enabled` | bool | `true` | 开解工具可见性。 |
+| `counseling_enabled` | bool | `true` | `/排盘`、`/卜卦`、`/开解` 等命理咨询命令总开关。 |
+| `tarot_enabled` | bool | `true` | `/塔罗` 开关。 |
+| `health_enabled` | bool | `true` | `/健康` 开关。 |
+| `growth_engine_enabled` | bool | `true` | `/成长` 与每周成长反思开关。 |
 | `state_layer_max_tokens` | int | `220` | 状态层注入预算。 |
 | `state_layer_max_anchors` | int | `2` | 单次最多注入记忆条数。 |
 | `proactive_max_per_day` | int | `2` | 每日主动消息上限。 |
